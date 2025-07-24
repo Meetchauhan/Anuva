@@ -1,8 +1,9 @@
 import { z } from "zod";
-import { storage } from "../storage.ts";
+import { storage } from "../storage.js";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
-import { generateToken } from "../utils/generateToken.ts";
+import { generateToken } from "../utils/generateToken.js";
+import { Request, Response } from "express";
 
 const signupSchema = z.object({
   firstName: z.string().min(2),
@@ -18,7 +19,7 @@ const loginSchema = z.object({
     password: z.string()
   });
 
-export const signup = async (req, res) => {
+export const signup = async (req: Request, res: Response) => {
   try {
     const userData = signupSchema.parse(req.body);
 
@@ -39,15 +40,12 @@ export const signup = async (req, res) => {
       email: userData.email,
       firstName: userData.firstName,
       lastName: userData.lastName,
-      dateOfBirth: userData.dateOfBirth,
+      dateOfBirth:userData.dateOfBirth,
       phoneNumber: userData.phoneNumber,
       passwordHash,
       profileImageUrl: null,
     });
     console.log("user created", user);
-
-    // Create session
-    (req.session as any).userId = user.id;
 
     res.status(201).json({
       message: "Account created successfully",
@@ -64,7 +62,7 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+export const login = async (req:Request, res:Response) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
@@ -80,41 +78,39 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Create session
-    // (req.session as any).userId = user.id;
    const token =  generateToken(res, user.id);
    console.log("token from login",token);
 
     res.json({
         message: "Login successful",
         token: token,
-      // user: {
-      //   id: user.id,
-      //   email: user.email,
-      //   firstName: user.firstName,
-      //   lastName: user.lastName,
-      // },
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(400).json({ message: "Invalid login data" });
   }
 };
-export const logout = async (req, res) => {
+export const logout = async (req:Request, res:Response) => {
   /* ... */
 };
-export const getUser = async (req, res) => {
+export const getUser = async (req:Request, res:Response) => {
   try {
-    if (!req.user) {
+    if (!res.locals.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
     res.json({
       user: {
-        id: req.user.id,
-        email: req.user.email,
-        firstName: req.user.firstName,
-        lastName: req.user.lastName,
-        phone: req.user.phone,
+        id: res.locals.user.id,
+        email: res.locals.user.email,
+        firstName: res.locals.user.firstName,
+        lastName: res.locals.user.lastName,
+        phone: res.locals.user.phone,
       },
     });
   } catch (error) {

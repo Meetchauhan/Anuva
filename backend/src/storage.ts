@@ -26,8 +26,8 @@ import {
   type InsertAchievement,
   type UserProgress,
   type InsertUserProgress,
-} from "../shared/schema.ts";
-import { db } from "./db.ts";
+} from "../shared/schema.js";
+import { db } from "./db.js";
 import { eq, desc, and, gt } from "drizzle-orm";
 
 export interface IStorage {

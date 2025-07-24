@@ -4,8 +4,8 @@ import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
-import { storage } from "./storage";
-import { User, InsertUser } from "@shared/schema";
+import { storage } from "./storage.js";
+import { User, InsertUser } from "../shared/schema.js";
 
 // Extend the Express.User interface with our User type
 declare global {
@@ -22,7 +22,7 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
-  const pgStore = connectPg(session);
+  const pgStore = connectPgSimple(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: true,
@@ -80,7 +80,7 @@ export function hasRole(roles: string[]) {
       return res.status(401).json({ message: "Not authenticated" });
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(res.locals.user.role)) {
       return res.status(403).json({ message: "Not authorized for this resource" });
     }
 
@@ -262,7 +262,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/auth/user", (req: Request, res: Response) => {
     if (req.isAuthenticated()) {
-      res.json(req.user);
+      res.json(res.locals.user);
     } else {
       res.status(401).json({ message: "Not authenticated" });
     }

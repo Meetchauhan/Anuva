@@ -1,11 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage.ts";
+import { storage } from "./storage.js";
 import session from "express-session";
 // @ts-ignore: No type definitions for connect-pg-simple
 import connectPg from "connect-pg-simple";
 import bcrypt from "bcrypt";
-import { insertIntakeFormSchema, insertHealthMetricSchema, insertLabResultSchema, insertAppointmentSchema, insertEmergencyContactSchema, insertUserSettingsSchema, type UserProgress } from "../shared/schema.ts";
+import { insertIntakeFormSchema, insertHealthMetricSchema, insertLabResultSchema, insertAppointmentSchema, insertEmergencyContactSchema, insertUserSettingsSchema, type UserProgress } from "../shared/schema.js";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 
@@ -232,20 +232,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    req.user = user;
+    res.locals.user = user;
     next();
   };
 
   // Auth routes
   // app.get('/api/auth/user', requireAuth, async (req: any, res) => {
-  //   res.json(req.user);
+  //   res.json(res.locals.user);
   // });
 
   // Protected routes use requireAuth instead of isAuthenticated
   // Intake forms routes
   app.get('/api/intake-forms', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const forms = await storage.getIntakeForms(userId);
       res.json(forms);
     } catch (error) {
@@ -257,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile
   app.patch('/api/user/profile', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const updates = req.body;
       const user = await storage.updateUser(userId, updates);
       res.json(user);
@@ -270,7 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create intake form
   app.post('/api/intake-forms', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const formData = insertIntakeFormSchema.parse({ ...req.body, userId });
       const form = await storage.createIntakeForm(formData);
       res.json(form);
@@ -283,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/intake-forms/:id/complete', requireAuth, async (req: any, res) => {
     try {
       const formId = parseInt(req.params.id);
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       
       // Complete the form
       const form = await storage.completeIntakeForm(formId);
@@ -304,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Health metrics routes
   app.get('/api/health-metrics', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const metrics = await storage.getHealthMetrics(userId);
       res.json(metrics);
     } catch (error) {
@@ -315,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/health-metrics', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const metricData = insertHealthMetricSchema.parse({ ...req.body, userId });
       const metric = await storage.createHealthMetric(metricData);
       res.json(metric);
@@ -328,7 +328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Lab results routes
   app.get('/api/lab-results', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const results = await storage.getLabResults(userId);
       res.json(results);
     } catch (error) {
@@ -339,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/lab-results', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const resultData = insertLabResultSchema.parse({ ...req.body, userId });
       const result = await storage.createLabResult(resultData);
       res.json(result);
@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Appointments routes
   app.get('/api/appointments', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const appointments = await storage.getAppointments(userId);
       res.json(appointments);
     } catch (error) {
@@ -363,7 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/appointments/upcoming', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const appointments = await storage.getUpcomingAppointments(userId);
       res.json(appointments);
     } catch (error) {
@@ -374,7 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/appointments', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const appointmentData = insertAppointmentSchema.parse({ ...req.body, userId });
       const appointment = await storage.createAppointment(appointmentData);
       res.json(appointment);
@@ -387,7 +387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Emergency contacts routes
   app.get('/api/emergency-contacts', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const contacts = await storage.getEmergencyContacts(userId);
       res.json(contacts);
     } catch (error) {
@@ -398,7 +398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/emergency-contacts', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const contactData = insertEmergencyContactSchema.parse({ ...req.body, userId });
       const contact = await storage.createEmergencyContact(contactData);
       res.json(contact);
@@ -434,7 +434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User settings routes
   app.get('/api/user-settings', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const settings = await storage.getUserSettings(userId);
       res.json(settings || {});
     } catch (error) {
@@ -445,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/user-settings', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const settingsData = insertUserSettingsSchema.parse({ ...req.body, userId });
       const settings = await storage.upsertUserSettings(settingsData);
       res.json(settings);
@@ -458,7 +458,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Achievement routes
   app.get('/api/achievements', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const achievements = await storage.getAchievements(userId);
       res.json(achievements);
     } catch (error) {
@@ -469,7 +469,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/achievements', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const achievement = await storage.createAchievement({ ...req.body, userId });
       res.json(achievement);
     } catch (error) {
@@ -480,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/achievements/:badgeId/unlock', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       const { badgeId } = req.params;
       const achievement = await storage.unlockAchievement(userId, badgeId);
       res.json(achievement);
@@ -493,7 +493,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User progress routes
   app.get('/api/user-progress', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = res.locals.user.id;
       let progress = await storage.getUserProgress(userId);
       
       // Create default progress if doesn't exist
