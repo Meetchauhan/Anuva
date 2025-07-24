@@ -1,0 +1,17 @@
+/* @import "tailwindcss"; */
+
+
+/* @import "tailwindcss/preflight"; */
+@import "tailwindcss";
+/* @tailwind utilities;
+@tailwind base;
+@tailwind components; */
+
+/* @reference border-gray-200;
+@reference px-4;
+@reference py-2;
+@reference font-sans;
+@reference antialiased;
+@reference bg-background;
+@reference text-foreground; */
+
