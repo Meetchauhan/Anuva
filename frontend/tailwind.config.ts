@@ -1,42 +1,90 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
-const config: Config = {
-  content: ['./index.html', './src/**/*.{ts,tsx,js,jsx}'],
+export default {
+  darkMode: ["class"],
+  content: ["./anuvaFront/index.html", "./anuvaFront/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        background: 'hsl(var(--background) / <alpha-value>)',
-        foreground: 'hsl(var(--foreground) / <alpha-value>)',
-        muted: 'hsl(var(--muted) / <alpha-value>)',
-        'muted-foreground': 'hsl(var(--muted-foreground) / <alpha-value>)',
-        popover: 'hsl(var(--popover) / <alpha-value>)',
-        'popover-foreground': 'hsl(var(--popover-foreground) / <alpha-value>)',
-        card: 'hsl(var(--card) / <alpha-value>)',
-        'card-foreground': 'hsl(var(--card-foreground) / <alpha-value>)',
-        border: 'hsl(var(--border) / <alpha-value>)',
-        input: 'hsl(var(--input) / <alpha-value>)',
-        primary: 'hsl(var(--primary) / <alpha-value>)',
-        'primary-foreground': 'hsl(var(--primary-foreground) / <alpha-value>)',
-        secondary: 'hsl(var(--secondary) / <alpha-value>)',
-        'secondary-foreground': 'hsl(var(--secondary-foreground) / <alpha-value>)',
-        accent: 'hsl(var(--accent) / <alpha-value>)',
-        'accent-foreground': 'hsl(var(--accent-foreground) / <alpha-value>)',
-        destructive: 'hsl(var(--destructive) / <alpha-value>)',
-        'destructive-foreground': 'hsl(var(--destructive-foreground) / <alpha-value>)',
-        ring: 'hsl(var(--ring) / <alpha-value>)',
-
-        // Health-specific colors
-        'health-blue': 'hsl(var(--health-blue) / <alpha-value>)',
-        'health-green': 'hsl(var(--health-green) / <alpha-value>)',
-        'health-purple': 'hsl(var(--health-purple) / <alpha-value>)',
-        'health-gray': 'hsl(var(--health-gray) / <alpha-value>)',
-        'health-bg': 'hsl(var(--health-bg) / <alpha-value>)',
-      },
       borderRadius: {
-        DEFAULT: 'var(--radius)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
+        },
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)",
+        },
+        primary: {
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
+        },
+        secondary: {
+          DEFAULT: "var(--secondary)",
+          foreground: "var(--secondary-foreground)",
+        },
+        muted: {
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
+        },
+        accent: {
+          DEFAULT: "var(--accent)",
+          foreground: "var(--accent-foreground)",
+        },
+        destructive: {
+          DEFAULT: "var(--destructive)",
+          foreground: "var(--destructive-foreground)",
+        },
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        chart: {
+          "1": "var(--chart-1)",
+          "2": "var(--chart-2)",
+          "3": "var(--chart-3)",
+          "4": "var(--chart-4)",
+          "5": "var(--chart-5)",
+        },
+        sidebar: {
+          DEFAULT: "var(--sidebar-background)",
+          foreground: "var(--sidebar-foreground)",
+          primary: "var(--sidebar-primary)",
+          "primary-foreground": "var(--sidebar-primary-foreground)",
+          accent: "var(--sidebar-accent)",
+          "accent-foreground": "var(--sidebar-accent-foreground)",
+          border: "var(--sidebar-border)",
+          ring: "var(--sidebar-ring)",
+        },
+      },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
-  plugins: [],
-}
-export default config
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+} satisfies Config;
