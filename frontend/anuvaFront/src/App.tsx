@@ -11,7 +11,7 @@ import { ProtectedRoute } from "./components/auth/protected-route";
 import { UserRole } from "./types/user-roles";
 
 // User auth hook
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useUserAuth } from "@/hooks/useAuth";
 
 // Layouts
 import AppLayout from "@/layouts/app-layout";
@@ -53,10 +53,21 @@ function AppWithConditionalLayout({ children }: { children: React.ReactNode }) {
 // User Router logic
 function UserRouter() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { isToken } = useUserAuth();
+
+  console.log("isToken", isToken);
 
   return (
     <Switch>
       <Route path="/auth" component={Auth} />
+      <Route path="/admin/auth" component={AuthPage} />
+      <Route path="/admin/intake-form" component={IntakeFormPage} />
+      <Route path="/admin/dashboard" component={Dashboard} />
+      <Route path="/admin/patients" component={Patients} />
+      <Route path="/admin/patients/:id" component={PatientDetail} />
+      <Route path="/admin/analytics" component={PatientAnalytics} />
+      <Route path="/admin/settings" component={Settings} />
+      <Route path="/admin/patient" component={PatientDashboard} />
       {isLoading ? (
         <Route path="*">
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -66,20 +77,22 @@ function UserRouter() {
             </div>
           </div>
         </Route>
-      ) : !isAuthenticated ? (
+       ) : !isToken ? ( 
         <>
           <Route path="/" component={Landing} />
-          <Route component={Landing} />
-        </>
-      ) : (
+           <Route component={Landing} /> 
+           </>
+       ) : (
         <>
-          <Route path="/" component={Home} />
+           <Route path="/" component={Home} /> 
+
           <Route path="/home" component={Home} />
           <Route path="/analytics" component={Analytics} />
           <Route path="/settings" component={UserSettings} />
+           {/* <Route path="/admin/auth" component={AuthPage} /> */}
           <Route component={NotFound} />
-        </>
-      )}
+          </>
+      )} 
     </Switch>
   );
 }
@@ -89,71 +102,75 @@ function App() {
   // For demonstration, let's use a simple variable:
   const isAdminApp = window.location.pathname.startsWith("/admin"); // or any other logic
 
-  if (isAdminApp) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <SettingsProvider>
-            <TooltipProvider>
-              <Switch>
-                <Route path="/admin/intake-form" component={IntakeFormPage} />
-                <Route>
-                  <AppWithConditionalLayout>
-                    <Switch>
-                      {/* Public Routes */}
-                      <Route path="/admin/auth" component={AuthPage} />
+  // if (isAdminApp) {
+  //   return (
+  //     <QueryClientProvider client={queryClient}>
+  //       <AuthProvider>
+  //         <SettingsProvider>
+  //           <TooltipProvider>
+  //             <Switch>
+  //               <Route path="/admin/intake-form" component={IntakeFormPage} />
+  //               <Route>
+  //                 <AppWithConditionalLayout>
+  //                   <Switch>
+  //                     {/* Public Routes */}
+  //                     <Route path="/admin/auth" component={AuthPage} />
 
-                      {/* Provider-specific Routes */}
-                      <ProtectedRoute path="/admin/dashboard" allowedRoles={[UserRole.PROVIDER]}>
-                        <Dashboard />
-                      </ProtectedRoute>
-                      <ProtectedRoute path="/admin/provider" allowedRoles={[UserRole.PROVIDER]}>
-                        <Dashboard />
-                      </ProtectedRoute>
-                      <ProtectedRoute path="/admin/patients" allowedRoles={[UserRole.PROVIDER]}>
-                        <Patients />
-                      </ProtectedRoute>
-                      <ProtectedRoute path="/admin/patients/:id" allowedRoles={[UserRole.PROVIDER]}>
-                        <PatientDetail />
-                      </ProtectedRoute>
-                      <ProtectedRoute path="/admin/analytics" allowedRoles={[UserRole.PROVIDER]}>
-                        <PatientAnalytics />
-                      </ProtectedRoute>
-                      <ProtectedRoute path="/admin/settings" allowedRoles={[UserRole.PROVIDER]}>
-                        <Settings />
-                      </ProtectedRoute>
+  //                     {/* Provider-specific Routes */}
+  //                     <ProtectedRoute path="/admin/dashboard" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <Dashboard />
+  //                     </ProtectedRoute>
+  //                     <ProtectedRoute path="/admin/provider" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <Dashboard />
+  //                     </ProtectedRoute>
+  //                     <ProtectedRoute path="/admin/patients" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <Patients />
+  //                     </ProtectedRoute>
+  //                     <ProtectedRoute path="/admin/patients/:id" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <PatientDetail />
+  //                     </ProtectedRoute>
+  //                     <ProtectedRoute path="/admin/analytics" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <PatientAnalytics />
+  //                     </ProtectedRoute>
+  //                     <ProtectedRoute path="/admin/settings" allowedRoles={[UserRole.PROVIDER]}>
+  //                       <Settings />
+  //                     </ProtectedRoute>
 
-                      {/* Patient Dashboard */}
-                      <ProtectedRoute path="/admin/patient" allowedRoles={[UserRole.PATIENT]}>
-                        <PatientDashboard />
-                      </ProtectedRoute>
+  //                     {/* Patient Dashboard */}
+  //                     <ProtectedRoute path="/admin/patient" allowedRoles={[UserRole.PATIENT]}>
+  //                       <PatientDashboard />
+  //                     </ProtectedRoute>
 
-                      {/* Caregiver Dashboard */}
-                      <ProtectedRoute path="/admin/caregiver" allowedRoles={[UserRole.CAREGIVER]}>
-                        <CaregiverDashboard />
-                      </ProtectedRoute>
+  //                     {/* Caregiver Dashboard */}
+  //                     <ProtectedRoute path="/admin/caregiver" allowedRoles={[UserRole.CAREGIVER]}>
+  //                       <CaregiverDashboard />
+  //                     </ProtectedRoute>
 
-                      {/* Not Found */}
-                      <Route component={NotFound} />
-                    </Switch>
-                  </AppWithConditionalLayout>
-                </Route>
-              </Switch>
-              <Toaster />
-            </TooltipProvider>
-          </SettingsProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    );
-  }
+  //                     {/* Not Found */}
+  //                     <Route component={NotFound} />
+  //                   </Switch>
+  //                 </AppWithConditionalLayout>
+  //               </Route>
+  //             </Switch>
+  //             <Toaster />
+  //           </TooltipProvider>
+  //         </SettingsProvider>
+  //       </AuthProvider>
+  //     </QueryClientProvider>
+  //   );
+  // }
 
   // User App
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <UserRouter />
-      </TooltipProvider>
+      <AuthProvider>
+        <SettingsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <UserRouter />
+          </TooltipProvider>
+        </SettingsProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

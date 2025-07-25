@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { AuthContext } from "@/context/auth-context";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -25,6 +26,10 @@ interface LoginFormProps {
 export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const auth = useAuth();
+
+  console.log("isToken---", auth);
+  
   
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
@@ -35,25 +40,29 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
-
+      const result = await response.json();      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.message || 'Login failed');
       }
+      
+       if (result.token) {
+      sessionStorage.setItem('token', result.token);
+    }
 
       toast({
         title: "Welcome Back",
         description: "Successfully signed in to your healthcare dashboard.",
       });
      
-      onLoginSuccess();
+       onLoginSuccess();
     } catch (error) {
       toast({
         title: "Sign In Failed",

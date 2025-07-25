@@ -6,6 +6,8 @@ export default function Header() {
   const [, navigate] = useLocation();
 
   const handleLogout = async () => {
+    sessionStorage.removeItem('token');
+    navigate('/', {replace: true});
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       navigate('/auth', {replace: true}); // or '/signin' if that's your login route

@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useLocation } from "wouter";
 import SignupForm from "@/components/auth/signup-form";
 import LoginForm from "@/components/auth/login-form";
+import { AuthContext } from "@/context/auth-context";
 
 export default function Auth() {
   const [, navigate] = useLocation();
   const [isSignup, setIsSignup] = useState(false);
-
   const handleAuthSuccess = () => {
+
     // Redirect to home page after successful authentication
-    navigate("/");
+    navigate("/home");
   };
 
   const switchToSignup = () => setIsSignup(true);

@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { Home, BarChart3, Settings } from "lucide-react";
 
 const tabs = [
-  { id: "home", path: "/", label: "Home", icon: Home },
+  { id: "home", path: "/home", label: "Home", icon: Home },
   { id: "analytics", path: "/analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", path: "/settings", label: "Settings", icon: Settings },
 ];

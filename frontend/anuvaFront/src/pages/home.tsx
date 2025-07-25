@@ -22,35 +22,35 @@ export default function Home() {
   });
 
   // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
+  // useEffect(() => {
+  //   if (!isLoading && !isAuthenticated) {
+  //     toast({
+  //       title: "Unauthorized",
+  //       description: "You are logged out. Logging in again...",
+  //       variant: "destructive",
+  //     });
+  //     setTimeout(() => {
+  //       window.location.href = "/api/login";
+  //     }, 500);
+  //     return;
+  //   }
+  // }, [isAuthenticated, isLoading, toast]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="animate-pulse">
-          <div className="h-16 bg-white border-b"></div>
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
-          <div className="h-16 bg-white border-b"></div>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50">
+  //       <div className="animate-pulse">
+  //         <div className="h-16 bg-white border-b"></div>
+  //         <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
+  //         <div className="h-16 bg-white border-b"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated) {
-    return null; // Will redirect via useEffect
-  }
+  // if (!isAuthenticated) {
+  //   return null; // Will redirect via useEffect
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">

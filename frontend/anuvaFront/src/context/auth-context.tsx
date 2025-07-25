@@ -1,14 +1,18 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import {
   useQuery,
   useMutation,
 } from "@tanstack/react-query";
-import { User, UserRegistrationData } from "@/types";
-import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
+import type { User, UserRegistrationData } from "../types";
+import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { useToast } from "../hooks/use-toast";
+import { get } from "http";
+import getToken from "../components/getToken/gettoken";
+import { boolean } from "zod";
 
 // Define the auth context type
 interface AuthContextType {
+  tokenAvailable: boolean;
   user: User | null;
   isLoading: boolean;
   error: Error | null;
@@ -34,21 +38,27 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 // Create the auth provider
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [tokenAvailable, setTokenAvailable] = useState(false);
   const { toast } = useToast();
-  
+  const token = getToken();
   // Fetch the current user
   const {
     data: user,
     error,
     isLoading,
   } = useQuery<User | undefined, Error>({
-    queryKey: ["/api/auth/user"],
+    queryKey: ["http://localhost:5000/api/auth/user"],
     queryFn: async ({ queryKey }) => {
       try {
         // First, try the standard auth endpoint
         const res = await fetch(queryKey[0] as string, {
           credentials: "include",
-        });
+          headers:{
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          method: "GET",
+        });   
         
         // If authenticated, return the user
         if (res.ok) {
@@ -80,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Note: The server has /api/auth/login endpoint setup, but for demo/testing purposes, 
       // we'll also try to use a fallback strategy to the currentUser endpoint if normal login fails
       try {
-        const res = await apiRequest("POST", "/api/auth/login", credentials);
+        const res = await apiRequest("POST", "http://localhost:5000/api/auth/login", credentials);
         return await res.json();
       } catch (error) {
         console.log("Login error with standard auth endpoint, trying alternative:", error);
@@ -98,7 +108,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     },
     onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/auth/user"], user);
+      setTokenAvailable(true);
+      queryClient.setQueryData(["http://localhost:5000/api/auth/user"], user);
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.fullName}!`,
@@ -120,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await res.json();
     },
     onSuccess: (user: User) => {
-      queryClient.setQueryData(["/api/auth/user"], user);
+      queryClient.setQueryData(["http://localhost:5000/api/auth/user"], user);
       toast({
         title: "Registration successful",
         description: `Welcome to Anuva OS, ${user.fullName}!`,
@@ -141,7 +152,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/auth/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/auth/user"], null);
+      queryClient.setQueryData(["http://localhost:5000/api/auth/user"], null);
+      // setIsToken(false);
       toast({
         title: "Logged out",
         description: "You have been successfully logged out",
@@ -159,6 +171,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
+        tokenAvailable,
         user: user ?? null,
         isLoading,
         error,
