@@ -15,9 +15,9 @@ const signupSchema = z.object({
 });
 
 const loginSchema = z.object({
-    email: z.string().email(),
-    password: z.string()
-  });
+  email: z.string().email(),
+  password: z.string(),
+});
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -40,7 +40,7 @@ export const signup = async (req: Request, res: Response) => {
       email: userData.email,
       firstName: userData.firstName,
       lastName: userData.lastName,
-      dateOfBirth:userData.dateOfBirth,
+      dateOfBirth: userData.dateOfBirth,
       phoneNumber: userData.phoneNumber,
       passwordHash,
       profileImageUrl: null,
@@ -54,15 +54,17 @@ export const signup = async (req: Request, res: Response) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        dateOfBirth: user.dateOfBirth,
+        phoneNumber: user.phoneNumber,
       },
     });
   } catch (error) {
-    console.error("Signup error:", error);
+    console.log("Signup error:", error);
     res.status(400).json({ message: "Invalid signup data" });
   }
 };
 
-export const login = async (req:Request, res:Response) => {
+export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
@@ -78,28 +80,30 @@ export const login = async (req:Request, res:Response) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-   const token =  generateToken(res, user.id);
-   console.log("token from login",token);
+    const token = generateToken(res, user.id);
+    console.log("token from login", token);
 
     res.json({
-        message: "Login successful",
-        token: token,
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
+      message: "Login successful",
+      token: token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        dateOfBirth: user.dateOfBirth,
+        phoneNumber: user.phoneNumber,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(400).json({ message: "Invalid login data" });
   }
 };
-export const logout = async (req:Request, res:Response) => {
+export const logout = async (req: Request, res: Response) => {
   /* ... */
 };
-export const getUser = async (req:Request, res:Response) => {
+export const getUser = async (req: Request, res: Response) => {
   try {
     if (!res.locals.user) {
       return res.status(401).json({ message: "Not authenticated" });

@@ -1,8 +1,8 @@
-import  express from "express";
-import dotenv from "dotenv"
-import 'dotenv/config';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import express from "express";
+import dotenv from "dotenv";
+import "dotenv/config";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import all_routers from "./src/routes/all_routers.js";
@@ -10,14 +10,16 @@ import all_routers from "./src/routes/all_routers.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config()
+dotenv.config();
 
 const app = express();
 
-  app.use(cors({
+app.use(
+  cors({
     origin: "http://localhost:5173", // your frontend URL
-    credentials: true,               // <--- this is required!
-  }));
+    credentials: true, // <--- this is required!
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
@@ -76,20 +78,21 @@ app.use("/api", all_routers);
 //     throw err;
 //   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  // if (app.get("env") === "development") {
-  //   await setupVite(app, server);
-  // } else {
-  //   serveStatic(app);
-  // }
+// importantly only setup vite in development and after
+// setting up all the other routes so the catch-all route
+// doesn't interfere with the other routes
+// if (app.get("env") === "development") {
+//   await setupVite(app, server);
+// } else {
+//   serveStatic(app);
+// }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  app.listen(port, () => {
-    console.log(`serving on port ${port}`);
-  });
+// ALWAYS serve the app on port 5000
+// this serves both the API and the client.
+// It is the only port that is not firewalled.
+
 // })();
+
+app.listen(process.env.PORT, () => {
+  console.log(`server is running on port ${process.env.PORT}`);
+});
