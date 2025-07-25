@@ -1,62 +1,38 @@
-import { z } from "zod";
-import { storage } from "../storage.js";
 import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
 import { generateToken } from "../utils/generateToken.js";
 import { Request, Response } from "express";
-
-const signupSchema = z.object({
-  firstName: z.string().min(2),
-  lastName: z.string().min(2),
-  dateOfBirth: z.string(),
-  email: z.string().email(),
-  phoneNumber: z.string().min(10),
-  password: z.string().min(8),
-});
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
+import userModel from "../modules/user.model.js";
+import { Types } from "mongoose";
+import { signupSchema, loginSchema } from "../validations/user.validation.js";
 
 export const signup = async (req: Request, res: Response) => {
   try {
     const userData = signupSchema.parse(req.body);
 
-    // Check if user already exists
-    const existingUser = await storage.getUserByEmail(userData.email);
+    const existingUser = await userModel.findOne({ email: userData.email });
     if (existingUser) {
       return res
         .status(400)
         .json({ message: "User with this email already exists" });
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(userData.password, 12);
 
-    // Create user
-    const user = await storage.createUser({
-      id: nanoid(),
+    const user = await userModel.create({
       email: userData.email,
       firstName: userData.firstName,
       lastName: userData.lastName,
       dateOfBirth: userData.dateOfBirth,
       phoneNumber: userData.phoneNumber,
       passwordHash,
-      profileImageUrl: null,
     });
-    console.log("user created", user);
 
-    res.status(201).json({
+    const token = generateToken(res, user._id as Types.ObjectId);
+
+    return res.status(201).json({
       message: "Account created successfully",
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        dateOfBirth: user.dateOfBirth,
-        phoneNumber: user.phoneNumber,
-      },
+      user,
+      token,
     });
   } catch (error) {
     console.log("Signup error:", error);
@@ -68,57 +44,51 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = loginSchema.parse(req.body);
 
-    // Find user by email
-    const user = await storage.getUserByEmail(email);
+    const user = await userModel.findOne({ email });
     if (!user || !user.passwordHash) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
     if (!isValidPassword) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = generateToken(res, user.id);
-    console.log("token from login", token);
+    const token = generateToken(res, user._id as Types.ObjectId);
 
-    res.json({
+    return res.json({
       message: "Login successful",
-      token: token,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        dateOfBirth: user.dateOfBirth,
-        phoneNumber: user.phoneNumber,
-      },
+      user,
+      token,
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.log("Login error:", error);
     res.status(400).json({ message: "Invalid login data" });
   }
 };
 export const logout = async (req: Request, res: Response) => {
-  /* ... */
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== "development",
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 export const getUser = async (req: Request, res: Response) => {
   try {
     if (!res.locals.user) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    res.json({
-      user: {
-        id: res.locals.user.id,
-        email: res.locals.user.email,
-        firstName: res.locals.user.firstName,
-        lastName: res.locals.user.lastName,
-        phone: res.locals.user.phone,
-      },
+
+    const user = await userModel.findById(res.locals.user._id);
+    if (!user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    return res.json({
+      user,
     });
   } catch (error) {
-    console.error("Get user error:", error);
     res.status(500).json({ message: "Failed to get user" });
   }
 };

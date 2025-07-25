@@ -6,6 +6,7 @@ import { dirname } from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import all_routers from "./src/routes/all_routers.js";
+import "./src/utils/db.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

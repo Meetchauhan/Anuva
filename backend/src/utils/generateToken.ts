@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
-import { Response, NextFunction } from "express";
+import { Response } from "express";
+import { Types } from "mongoose";
 
-export const generateToken = (res:Response, userId:string) => {
+export const generateToken = (res: Response, userId: Types.ObjectId) => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
-  console.log("token from generateToken",token);
   res.cookie("jwt", token, {
     httpOnly: false,
     secure: true,

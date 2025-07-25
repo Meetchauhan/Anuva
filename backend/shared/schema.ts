@@ -21,7 +21,7 @@ export const sessions = pgTable(
     sess: jsonb("sess").notNull(),
     expire: timestamp("expire").notNull(),
   },
-  (table) => [index("IDX_session_expire").on(table.expire)],
+  (table) => [index("IDX_session_expire").on(table.expire)]
 );
 
 // User storage table with custom authentication
@@ -41,7 +41,9 @@ export const users = pgTable("users", {
 // Intake forms that patients need to complete - specialized for neurological care
 export const intakeForms = pgTable("intake_forms", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   title: varchar("title").notNull(),
   description: text("description"),
   formType: varchar("form_type").notNull(), // 'concussion_baseline', 'post_injury_assessment', 'symptom_tracking', 'return_to_play', 'cognitive_evaluation'
@@ -55,7 +57,9 @@ export const intakeForms = pgTable("intake_forms", {
 // Health metrics for neurological analytics
 export const healthMetrics = pgTable("health_metrics", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   metricType: varchar("metric_type").notNull(), // 'symptom_severity', 'cognitive_score', 'balance_test', 'reaction_time', 'headache_frequency', 'sleep_quality'
   value: text("value").notNull(), // JSON string for complex values or numeric scores
   unit: varchar("unit"), // 'score', 'ms', 'severity_1-10', 'hours', etc.
@@ -65,7 +69,9 @@ export const healthMetrics = pgTable("health_metrics", {
 // Neurological test results and assessments
 export const labResults = pgTable("lab_results", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   testName: varchar("test_name").notNull(), // 'ImPACT Test', 'MRI Scan', 'CT Scan', 'Neuropsychological Assessment', 'SCAT5', 'King-Devick Test'
   result: varchar("result").notNull(),
   unit: varchar("unit"),
@@ -77,7 +83,9 @@ export const labResults = pgTable("lab_results", {
 // Neurological care appointments
 export const appointments = pgTable("appointments", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   providerName: varchar("provider_name").notNull(),
   appointmentType: varchar("appointment_type").notNull(), // 'Neurologist Consultation', 'Concussion Baseline', 'Follow-up Assessment', 'Cognitive Testing', 'Return-to-Play Evaluation'
   scheduledAt: timestamp("scheduled_at").notNull(),
@@ -88,7 +96,9 @@ export const appointments = pgTable("appointments", {
 // Emergency contacts
 export const emergencyContacts = pgTable("emergency_contacts", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   name: varchar("name").notNull(),
   relationship: varchar("relationship").notNull(),
   phone: varchar("phone").notNull(),
@@ -100,7 +110,10 @@ export const emergencyContacts = pgTable("emergency_contacts", {
 // User settings
 export const userSettings = pgTable("user_settings", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id)
+    .unique(),
   shareWithFamily: boolean("share_with_family").default(false),
   shareWithProviders: boolean("share_with_providers").default(true),
   appointmentReminders: boolean("appointment_reminders").default(true),
@@ -113,7 +126,9 @@ export const userSettings = pgTable("user_settings", {
 // Achievement badges for gamified progress tracking
 export const achievements = pgTable("achievements", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id),
   badgeType: varchar("badge_type").notNull(), // 'form_completion', 'streak', 'milestone', 'recovery_progress'
   badgeId: varchar("badge_id").notNull(), // unique identifier for the specific badge
   title: varchar("title").notNull(),
@@ -129,7 +144,10 @@ export const achievements = pgTable("achievements", {
 // User progress statistics for gamification
 export const userProgress = pgTable("user_progress", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+  userId: varchar("user_id")
+    .notNull()
+    .references(() => users.id)
+    .unique(),
   totalFormsCompleted: integer("total_forms_completed").default(0),
   currentStreak: integer("current_streak").default(0), // consecutive days with activity
   longestStreak: integer("longest_streak").default(0),
@@ -190,7 +208,9 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   createdAt: true,
 });
 
-export const insertEmergencyContactSchema = createInsertSchema(emergencyContacts).omit({
+export const insertEmergencyContactSchema = createInsertSchema(
+  emergencyContacts
+).omit({
   id: true,
   createdAt: true,
 });
