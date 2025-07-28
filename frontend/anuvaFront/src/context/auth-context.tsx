@@ -20,6 +20,7 @@ interface AuthContextType {
     mutate: (data: { username: string; password: string }) => void;
     isPending: boolean;
     error: Error | null;
+    token: boolean | null;
   };
   registerMutation: {
     mutate: (data: UserRegistrationData) => void;
@@ -73,8 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (legacyRes.ok) {
           return await legacyRes.json();
-        }
-        
+        }        
         // If both fail, return null
         return null;
       } catch (error) {
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!userRes.ok) {
           throw new Error("Login failed. Please check your username and password.");
         }
-        
+        setTokenAvailable(true);
         return await userRes.json();
       }
     },
@@ -179,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           mutate: loginMutation.mutate,
           isPending: loginMutation.isPending,
           error: loginMutation.error as Error,
+          token: tokenAvailable
         },
         registerMutation: {
           mutate: registerMutation.mutate,

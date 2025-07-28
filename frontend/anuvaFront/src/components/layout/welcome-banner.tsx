@@ -4,7 +4,8 @@ import type { Appointment, User } from "@shared/schema";
 
 export default function WelcomeBanner() {
   const { user } = useAuth() as { user: User | undefined; isLoading: boolean; isAuthenticated: boolean };
-  
+  const auth = useAuth();
+  console.log("auth", auth);
   const { data: upcomingAppointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments/upcoming"],
   });
