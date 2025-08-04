@@ -38,6 +38,7 @@ import Analytics from "@/pages/analytics";
 import UserSettings from "@/pages/settings"; // To avoid conflict with admin Settings
 import { Provider } from "react-redux";
 import  store  from "./store/store";
+import CreatePasswordPage from "./pages/createPasswordPage";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -134,6 +135,9 @@ function UserRouter() {
       </AuthRoute>
       <AuthRoute path="/admin/auth">
         <AuthPage />
+      </AuthRoute>
+      <AuthRoute path="/create-password">
+        <CreatePasswordPage />
       </AuthRoute>
       
       {/* Public Routes */}
