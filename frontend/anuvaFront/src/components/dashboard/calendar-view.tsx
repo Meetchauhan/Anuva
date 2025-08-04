@@ -75,7 +75,7 @@ const DayViewHeader = ({ date, onPrevDay, onNextDay }: {
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center">
         <CalendarIcon className="mr-2 h-5 w-5 text-primary" />
-        <h2 className="text-xl font-bold">
+        <h2 className="text-xl font-bold text-white">
           {isToday(date) ? 'Today' : format(date, 'EEEE')}
           <span className="ml-2 text-sm text-neutral-500 font-normal">
             {format(date, 'MMMM d, yyyy')}
@@ -83,16 +83,17 @@ const DayViewHeader = ({ date, onPrevDay, onNextDay }: {
         </h2>
       </div>
       <div className="flex items-center space-x-2">
-        <Button variant="outline" size="icon" onClick={onPrevDay}>
-          <ChevronLeft className="h-4 w-4" />
+        <Button variant="outline" size="icon" onClick={onPrevDay} className='bg-black text-white border border-gray-800 hover:bg-[#cde4da] hover:text-[#164630]'>
+          <ChevronLeft className="h-4 w-4 " />
         </Button>
         <Button 
           variant="outline" 
           onClick={() => window.location.reload()}
+          className='bg-black text-white border border-gray-800 hover:bg-[#cde4da] hover:text-[#164630]'
         >
           Today
         </Button>
-        <Button variant="outline" size="icon" onClick={onNextDay}>
+        <Button variant="outline" size="icon" onClick={onNextDay} className='bg-black text-white border border-gray-800 hover:bg-[#cde4da] hover:text-[#164630]'>
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
@@ -112,7 +113,7 @@ const WeekViewHeader = ({ startDate, onPrevWeek, onNextWeek }: {
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center">
         <CalendarIcon className="mr-2 h-5 w-5 text-primary" />
-        <h2 className="text-xl font-bold">
+        <h2 className="text-xl font-bold text-white">
           Week of {format(startDate, 'MMMM d')}
           <span className="ml-2 text-sm text-neutral-500 font-normal">
             {format(startDate, 'MMM d')} - {format(endDate, 'MMM d, yyyy')}

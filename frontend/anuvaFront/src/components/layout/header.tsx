@@ -6,15 +6,24 @@ export default function Header() {
   const [, navigate] = useLocation();
 
   const handleLogout = async () => {
-    sessionStorage.removeItem('token');
-    navigate('/', {replace: true});
+    // Check which token exists and clear the appropriate one
+    const adminToken = sessionStorage.getItem("adminAuthToken");
+    const userToken = sessionStorage.getItem("authToken");
+    
+    if (adminToken) {
+      sessionStorage.removeItem("adminAuthToken");
+      navigate("/admin/auth", { replace: true });
+    } else if (userToken) {
+      sessionStorage.removeItem("authToken");
+      navigate("/auth", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
+    
     try {
       await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-      navigate('/auth', {replace: true}); // or '/signin' if that's your login route
     } catch (error) {
-     
       console.error("error logging out", error);
-      
     }
   }
 

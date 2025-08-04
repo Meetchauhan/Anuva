@@ -1,6 +1,5 @@
 import { useLocation, Link } from "wouter";
 import { cn } from "@/lib/utils";
-import { User } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Brain, Users, Calendar, Settings, BookOpen, ClipboardList, BarChart3, Grid, LayoutDashboard, LogOut, Sun, Search } from "lucide-react";
 import tulaneLogoUrl from "@assets/image_1750693663501.png";
@@ -12,22 +11,35 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import useAdminProfile from "@/hooks/useAdminProfile";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { getAdminProfile, logoutAdmin } from "@/features/adminAuthSlice";
+import { navigate } from "wouter/use-browser-location";
 
 interface SidebarProps {
-  user?: User;
+  user?: any;
 }
 
 export default function Sidebar({ user }: SidebarProps) {
   const [location] = useLocation();
   const { toggleHighContrast, settings } = useSettings();
+  const dispatch = useDispatch<AppDispatch>();
   
   // Fetch current user if not provided
-  const { data: fetchedUser } = useQuery<User>({
-    queryKey: ['/api/currentUser'],
-    enabled: !user
-  });
+  // const { data: fetchedUser } = useQuery<User>({
+  //   queryKey: ['/api/currentUser'],
+  //   enabled: !user
+  // });
   
-  const displayUser = user || fetchedUser;
+
+  useEffect(()=>{
+    dispatch(getAdminProfile());
+  },[dispatch])
+  const displayUser = useAdminProfile();
+  console.log("displayUser", displayUser);
+  
   
   const mainMenuItems = [
     {
@@ -75,13 +87,18 @@ export default function Sidebar({ user }: SidebarProps) {
     if (href !== '/admin' && location.startsWith(href)) return true;
     return false;
   };
+
+  const handleLogoutAdmin = ()=>{
+    dispatch(logoutAdmin());
+    navigate("/admin/auth");
+  }
   
   return (
     <aside className="w-full md:w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col">
       <div className="p-4 border-b border-neutral-800">
         <div className="flex items-center mb-3">
           <div className="bg-primary rounded-md p-2 mr-3 brain-logo">
-            <Brain className="w-6 h-6" />
+            <Brain className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-white">Anuva OS</h1>
         </div>
@@ -162,14 +179,27 @@ export default function Sidebar({ user }: SidebarProps) {
         ))}
       </nav>
       
+      {/* Sign Out Button */}
+      <div className="px-4 py-2 border-t border-neutral-800">
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleLogoutAdmin}
+          className="flex items-center w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-900/20"
+        >
+          <LogOut className="w-4 h-4 mr-3" />
+          Sign Out
+        </Button>
+      </div>
+      
       <div className="p-4 border-t border-neutral-800">
         <div className="flex items-center">
-          <div className="h-8 w-8 rounded-full bg-primary-dark flex items-center justify-center text-white">
-            {displayUser?.fullName?.charAt(0) || 'U'}
+          <div className="h-8 w-8 rounded-full uppercase bg-primary-dark flex items-center justify-center text-white">
+            {displayUser?.user?.fullName?.charAt(0) || 'U'}
           </div>
           <div className="ml-3">
-            <p className="text-sm font-medium text-white">{displayUser?.fullName || 'Loading...'}</p>
-            <p className="text-xs text-neutral-400">{displayUser?.speciality || displayUser?.role || ''}</p>
+            <p className="text-sm font-medium text-white">{displayUser?.user?.fullName}</p>
+            {/* <p className="text-xs text-neutral-400">{displayUser?.user?.role}</p> */}
           </div>
         </div>
       </div>

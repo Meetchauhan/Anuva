@@ -26,6 +26,10 @@ import { usePatientsData } from '@/config/apiQueries';
 import { DefaultError, QueryKey, QueryClient, NoInfer } from '@tanstack/query-core';
 import { DefinedUseQueryResult, UseQueryResult, UseQueryOptions } from '@tanstack/react-query';
 import { DefinedInitialDataOptions, UndefinedInitialDataOptions } from '@tanstack/react-query';
+import { usePatient } from '@/hooks/usePatient';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { fetchPatients } from '@/features/patientSlice';
 
 
 
@@ -34,6 +38,7 @@ import { DefinedInitialDataOptions, UndefinedInitialDataOptions } from '@tanstac
 export default function Patients() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddPatientForm, setShowAddPatientForm] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   // Fetch patients with risk scores
   // const {
@@ -60,17 +65,77 @@ export default function Patients() {
   // });
 
 
-  const { patients, patientsLoading, patientsError } = usePatientsData();
+  // const { patients, patientsLoading, patientsError } = usePatientsData();
 
-  const isLoading = patientsLoading;
-  const error = patientsError;
+  // const isLoading = patientsLoading;
+  // const error = patientsError;
 
   // Filter patients based on search term
-  const filteredPatients = patients?.filter(patient => {
-    const fullName = getFullName(patient.firstName, patient.lastName).toLowerCase();
-    return fullName.includes(searchTerm.toLowerCase()) ||
-      (patient.schoolOrTeam && patient.schoolOrTeam.toLowerCase().includes(searchTerm.toLowerCase()));
-  });
+
+  // const displayPatients = [
+  //   {
+  //     id: 1,
+  //     firstName: "Michael",
+  //     lastName: "Thompson",
+  //     dateOfBirth: "1990-01-01",
+  //     gender: "Male",
+  //     riskLevel: "critical",
+  //     lastCheckin: {
+  //       pcssTotal: 100,
+  //     },
+  //     schoolOrTeam:"Westlake High School",
+  //     concussion:{
+  //       sportActivity: "Basketball",
+  //       dateOfInjury: "2025-07-22",
+  //     },
+  //   },
+  //   {
+  //     id: 2,
+  //     firstName: "Emma",
+  //     lastName: "Rodriguez",
+  //     dateOfBirth: "1990-01-01",
+  //     gender: "Male",
+  //     riskLevel: "recovering",
+  //     lastCheckin: {
+  //       pcssTotal: 100,
+  //     },
+  //     schoolOrTeam:"Westlake High School",
+  //     concussion:{
+  //       sportActivity: "Basketball",
+  //       dateOfInjury: "2025-07-25",
+  //     },
+  //   },
+  //   {
+  //     id: 3,
+  //     firstName: "James",
+  //     lastName: "Wilson",
+  //     dateOfBirth: "1990-01-01",
+  //     gender: "Male",
+  //     riskLevel: "stable",
+  //     lastCheckin: {
+  //       pcssTotal: 100,
+  //     },
+  //     concussion:{
+  //       sportActivity: "Basketball",
+  //       dateOfInjury: "2025-07-28",
+  //     },
+  //     schoolOrTeam:"Westlake High School",
+  //   },
+  // ];
+  
+
+  // const filteredPatients = displayPatients?.filter(patient => {
+  //   const fullName = getFullName(patient.firstName, patient.lastName).toLowerCase();
+  //   return fullName.includes(searchTerm.toLowerCase()) ||
+  //     (patient.schoolOrTeam && patient.schoolOrTeam.toLowerCase().includes(searchTerm.toLowerCase()));
+  // });
+  useEffect(()=>{
+    dispatch(fetchPatients());
+  }, [dispatch]);
+
+  const { patients, loading, error } = usePatient();
+  
+  const patientsData = patients.users?.slice().reverse();
 
 
   // Define columns for the data table
@@ -127,7 +192,7 @@ export default function Patients() {
       header: 'Actions',
       id: 'actions',
       cell: ({ row }: any) => (
-        <Link href={`/patients/${row.original.id}`}>
+        <Link href={`/admin/patients/${row.original._id}`}>
           <Button>View Details</Button>
         </Link>
       )
@@ -152,12 +217,12 @@ export default function Patients() {
               <Input
                 type="search"
                 placeholder="Search patients..."
-                className="pl-8 bg-neutral-800 border-neutral-700"
+                className="pl-8 bg-neutral-800 border-neutral-700 text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline" size="icon" className="shrink-0">
+            <Button variant="outline" size="icon" className="shrink-0 border-none bg-neutral-800 text-white hover:bg-[#cde4da] hover:text-[#164630]" > 
               <Filter className="h-4 w-4" />
             </Button>
             <Button 
@@ -170,19 +235,20 @@ export default function Patients() {
           </div>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {loading ? (
             <div className="text-center py-8 text-neutral-400">Loading patients...</div>
           ) : error ? (
-            <div className="text-center py-8 text-status-red">
+            <div className="text-center py-8 text-red-500">
               Error loading patients: {error instanceof Error ? error.message : String(error)}
             </div>
-          ) : filteredPatients && filteredPatients.length > 0 ? (
-            <DataTable columns={columns} data={filteredPatients} />
+          ) : patientsData && patientsData.length > 0 ? (
+            <DataTable columns={columns} data={patientsData} />
           ) : (
             <div className="text-center py-8 text-neutral-400">
               {searchTerm ? 'No patients match your search' : 'No patients available'}
             </div>
           )}
+           {/* <DataTable columns={columns} data={patientsData} /> */}
         </CardContent>
       </Card>
 

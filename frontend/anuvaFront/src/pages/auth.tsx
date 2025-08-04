@@ -8,7 +8,9 @@ export default function Auth() {
   const [, navigate] = useLocation();
   const [isSignup, setIsSignup] = useState(false);
   const handleAuthSuccess = () => {
-
+    console.log('Auth success callback called');
+    console.log('Token in sessionStorage:', sessionStorage.getItem('authToken'));
+    
     // Redirect to home page after successful authentication
     navigate("/home");
   };

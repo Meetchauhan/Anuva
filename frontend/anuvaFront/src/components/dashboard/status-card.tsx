@@ -10,7 +10,7 @@ export function StatusCard({ stats }: StatusCardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Active Patients */}
-      <Card className="bg-card border-none shadow-md">
+      <Card className="bg-card border-none shadow-md bg-[#1f1f1f] text-[#f2f2f2b3]">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground/70">Active Patients</h3>
@@ -20,7 +20,7 @@ export function StatusCard({ stats }: StatusCardProps) {
           </div>
           <div className="flex items-center">
             <div className="mr-3">
-              <div className="text-5xl font-bold text-foreground">{stats.totalPatients}</div>
+              <div className="text-5xl font-bold text-white ">{stats.totalPatients}</div>
               <div className="text-sm text-foreground/60 mt-1">Total</div>
             </div>
             <div className="flex-grow flex items-center space-x-2">
@@ -56,7 +56,7 @@ export function StatusCard({ stats }: StatusCardProps) {
       </Card>
       
       {/* Today's Appointments */}
-      <Card className="bg-card border-none shadow-md">
+      <Card className="bg-card border-none shadow-md bg-[#1f1f1f] text-[#f2f2f2b3]">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground/70">Today's Appointments</h3>
@@ -70,32 +70,32 @@ export function StatusCard({ stats }: StatusCardProps) {
                 <div className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
                 <span className="text-foreground/80">Initial Assessments</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">3</span>
+              <span className="text-sm font-medium text-primary-light text-white">3</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-2 h-2 rounded-full bg-primary-light mr-2" />
                 <span className="text-foreground/80">Follow-ups</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">5</span>
+              <span className="text-sm font-medium text-primary-light text-white">5</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-2 h-2 rounded-full bg-green-500 mr-2" />
                 <span className="text-foreground/80">Clearance Evaluations</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">1</span>
+              <span className="text-sm font-medium text-primary-light text-white ">1</span>
             </div>
           </div>
         </CardContent>
       </Card>
       
       {/* Documentation Status */}
-      <Card className="bg-card border-none shadow-md">
+      <Card className="bg-card border-none shadow-md bg-[#1f1f1f] text-[#f2f2f2b3]">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-foreground/70">Documentation Status</h3>
-            <button className="text-primary-light text-xs font-medium">View All</button>
+            <button className="text-primary-light text-xs font-medium text-white">View All</button>
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -103,21 +103,21 @@ export function StatusCard({ stats }: StatusCardProps) {
                 <CircleAlert className="w-4 h-4 mr-2 text-red-500" />
                 <span className="text-foreground/80">Pending Completion</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">{stats.pendingDocumentation}</span>
+              <span className="text-sm font-medium text-primary-light text-white">{stats.pendingDocumentation}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Edit className="w-4 h-4 mr-2 text-primary-light" />
                 <span className="text-foreground/80">AI Drafts Ready</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">{stats.aiDraftsReady}</span>
+              <span className="text-sm font-medium text-primary-light text-white">{stats.aiDraftsReady}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <FlagTriangleRight className="w-4 h-4 mr-2 text-green-500" />
                 <span className="text-foreground/80">Completed Today</span>
               </div>
-              <span className="text-sm font-medium text-primary-light">{stats.completedToday}</span>
+              <span className="text-sm font-medium text-primary-light text-white">{stats.completedToday}</span>
             </div>
           </div>
         </CardContent>

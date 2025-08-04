@@ -16,21 +16,25 @@ import PatientCheckinPdfStub from '@/components/patient/patient-checkin-pdf-stub
 import { PatientCombinedRecordV1_2, RelationalInjuryRead, InjuryAttributesRead, RelationalSymptomChecklistRead } from '@/types/index_v2'
 
 import { usePatientConcussionsID, usePatientDataID } from '@/config/apiQueries';
+import useSinglePatientData from '@/hooks/useSinglePatientData';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { fetchPatients } from '@/features/patientSlice';
 
 export default function PatientDetail() {
-  const [match, params] = useRoute('/patients/:id');
+  const [match, params] = useRoute('/admin/patients/:id');
   // const [match, params] = useRoute('/patients/:id');
-  const patientId = params?.id ? parseInt(params.id) : 0;
+  const patientId = params?.id  ?? 0;
+  const dispatch = useDispatch<AppDispatch>();
 
   // Copy to Clipboard utility
   const [notification, setNotification] = useState('');
   const [showNotification, setShowNotification] = useState(false);
 
   // Fetch patient details
-  const { patient, patientLoading, patientError, patient_v2_head } = usePatientDataID(patientId);
-
+  // const { patient, patientLoading, patientError, patient_v2_head } = usePatientDataID(patientId);
+  const { patient, patientLoading, patientError} = useSinglePatientData({patientId:patientId});
   const { concussions, concussionLoading, concussionError } = usePatientConcussionsID(patientId);
-
 
   // Fetch symptom check-ins for patient
   const {
@@ -92,6 +96,10 @@ export default function PatientDetail() {
     if (latestScore > 30) return 'recovering';
     return 'stable';
   };
+
+useEffect(()=>{
+  dispatch(fetchPatients());
+}, [dispatch]);
 
   // Update document title when patient data is loaded
   useEffect(() => {
@@ -156,8 +164,19 @@ export default function PatientDetail() {
   const copyToClipboardState = new CopyToClipboardState(
     notification, setNotification, showNotification, setShowNotification
   )
+  if(patientLoading){
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#257450]"></div>
+      </div>
+    );
+  }
+  if(patientError){
+    return <div>Error: {patientError}</div>;
+  }
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-4 md:p-6 bg-black">
+     
       <Header title={patient ? `${patient.firstName} ${patient.lastName}` : "Patient Details"} />
 
       <Tabs defaultValue="overview" className="mb-6">
@@ -418,7 +437,7 @@ export default function PatientDetail() {
           <SymptomRadarChart radarData={radarData} />
         </TabsContent>
         <TabsContent value="pdf">
-          <PatientCheckinPdfStub jsonData={patient_v2_head} />
+          <PatientCheckinPdfStub jsonData={patient} />
         </TabsContent>
       </Tabs >
 

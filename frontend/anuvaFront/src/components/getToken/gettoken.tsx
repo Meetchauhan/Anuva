@@ -1,5 +1,5 @@
 const getToken = () => {
-  const token = sessionStorage.getItem("token");
+  const token = sessionStorage.getItem("authToken");
   if (token) {
     return token;
   } else {

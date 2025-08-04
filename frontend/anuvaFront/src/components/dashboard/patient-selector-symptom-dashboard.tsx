@@ -177,7 +177,7 @@ export function PatientSelectorSymptomDashboard({ className }: PatientSelectorSy
       {/* Header with Patient Selector */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Patient Symptom Analytics</h2>
+          <h2 className="text-2xl font-bold tracking-tight ">Patient Symptom Analytics</h2>
           <p className="text-muted-foreground">
             Monitor individual patient symptom trends and recovery progress
           </p>

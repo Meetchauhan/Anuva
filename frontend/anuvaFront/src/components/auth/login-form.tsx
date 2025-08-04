@@ -10,9 +10,13 @@ import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthContext } from "@/context/auth-context";
+import { useLocation } from "wouter";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { authLogin, getUser } from "@/features/authSlice";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  patientId: z.string().min(1, "Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -24,46 +28,49 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFormProps) {
+  const [, navigate] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const auth = useAuth();
+  // const auth = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
 
-  console.log("isToken---", auth);
+  // console.log("isToken---", auth);
   
   
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
   });
-  const { isAuthenticated } = useAuth();
+  // const { isAuthenticated } = useAuth();
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
-      }
+      console.log('Attempting login with:', { email: data.patientId, password: '***' });
       
-       if (result.token) {
-      sessionStorage.setItem('token', result.token);
-    }
+      const result = await dispatch(authLogin(data)).unwrap();
+  
+      console.log('Login result:', result);
+      sessionStorage.setItem('authToken', result.token);
+           
+      if (result?.token) {
+        navigate("/home");
+        dispatch(getUser());
+        // sessionStorage.setItem('authToken', result.token);
+        console.log('Token set in sessionStorage:', result.token);
+      } else {
+        console.log('No token in response:', result);
+      }
+
 
       toast({
         title: "Welcome Back",
         description: "Successfully signed in to your healthcare dashboard.",
       });
      
-       onLoginSuccess();
+      // Call onLoginSuccess after token is set
+      onLoginSuccess();
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Sign In Failed",
         description: error instanceof Error ? error.message : "Invalid email or password",
@@ -89,19 +96,19 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
+            <Label htmlFor="patientId" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Email Address
+              Patient ID
             </Label>
             <Input
-              id="email"
-              type="email"
-              placeholder="john.doe@example.com"
-              {...register("email")}
-              className={errors.email ? "border-red-500" : ""}
+              id="patientId"
+              type="patientId"
+              placeholder="Enter your patient ID"
+              {...register("patientId")}
+              className={"bg-white text-black"}
             />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+            {errors.patientId && (
+              <p className="text-sm text-red-500">{errors.patientId.message}</p>
             )}
           </div>
 
@@ -129,6 +136,8 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
           >
             {isLoading ? "Signing In..." : "Sign In"}
           </Button>
+
+
 
           <div className="text-center space-y-2">
             <button

@@ -8,6 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Calendar, Mail, Phone, User } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { authSignup } from "@/features/authSlice";
+import { navigate } from "wouter/use-browser-location";
 
 const signupSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -32,6 +36,7 @@ interface SignupFormProps {
 export default function SignupForm({ onSignupSuccess, onSwitchToLogin }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const dispatch = useDispatch<AppDispatch>();
   
   const { register, handleSubmit, formState: { errors } } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema)
@@ -41,25 +46,33 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }: SignupF
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: data.firstName,
-          lastName: data.lastName,
-          dateOfBirth: data.dateOfBirth,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: data.password
-        }),
-      });
+      // const response = await fetch('http://localhost:5000/api/auth/signup', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     firstName: data.firstName,
+      //     lastName: data.lastName,
+      //     dateOfBirth: data.dateOfBirth,
+      //     email: data.email,
+      //     phoneNumber: data.phoneNumber,
+      //     password: data.password
+      //   }),
+      // });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Signup failed');
-      }
+      // if (!response.ok) {
+      //   const error = await response.json();
+      //   throw new Error(error.message || 'Signup failed');
+      // }
+      const response = await dispatch(authSignup(data)).unwrap();
+      
+        sessionStorage.setItem("authToken", response.token);
+        toast({
+          title: response.message,
+          description: "Please login to continue",  
+        });
+        navigate("/home");
 
       toast({
         title: "Account Created Successfully",

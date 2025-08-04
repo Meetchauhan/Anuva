@@ -93,19 +93,19 @@ export function ClinicTeamWidget({
       onDrag={handleDrag}
       nodeRef={nodeRef}
     >
-      <Card ref={nodeRef} className={cn("shadow-sm border border-primary/20 z-50", className)}>
+      <Card ref={nodeRef} className={cn("shadow-sm border border-primary/20 z-50 bg-[#1f1f1f]", className)}>
         <CardHeader className="p-3 pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm flex items-center">
             <div className="drag-handle cursor-move p-1 mr-1">
-              <GripVertical className="h-4 w-4 text-primary" />
+              <GripVertical className="h-4 w-4 text-[#257450]" />
             </div>
-            <Users className="h-4 w-4 text-primary mr-2" />
+            <Users className="h-4 w-4 text-[#257450] mr-2" />
             Care Team
           </CardTitle>
           <Button 
             variant="ghost" 
             size="sm" 
-            className="h-6 w-6 p-0" 
+            className="h-6 w-6 p-0 text-white hover:bg-[#cde4da]" 
             onClick={handleToggleExpand}
           >
             <X className="h-3 w-3" />
@@ -118,25 +118,25 @@ export function ClinicTeamWidget({
                 key={contact.id} 
                 className={cn(
                   "flex items-center justify-between p-2 rounded-md",
-                  contact.isPrimary ? "bg-primary/5" : "hover:bg-muted"
+                  contact.isPrimary ? "bg-[#2574500d]" : ""
                 )}
               >
                 <div className="flex items-center space-x-2">
-                  <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
+                  <div className="h-6 w-6 rounded-full bg-[#2574501a] flex items-center justify-center text-xs font-medium text-[#257450]">
                     {contact.name.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium">{contact.name}</h4>
-                    <p className="text-xs text-muted-foreground">
+                    <h4 className="text-sm font-medium text-white" >{contact.name}</h4>
+                    <p className="text-xs  text-[#64ce9e]">
                       {contact.role} • {contact.phoneNumber}
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1 ">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 border-primary/30 text-primary hover:bg-primary/10"
+                    className="h-7 border border-[#257450] text-[#257450] bg-[#121212] hover:bg-[#2574501a] hover:text-[#164630]"
                     onClick={() => handleCall(contact.phoneNumber)}
                   >
                     <Phone className="h-3 w-3 mr-1" />
@@ -145,9 +145,9 @@ export function ClinicTeamWidget({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 border-primary/30 text-primary hover:bg-primary/10"
+                    className="h-7  border-[#257450] text-[#257450] bg-[#121212] hover:bg-[#2574501a] hover:text-[#164630]"
                   >
-                    <MessageCircle className="h-3 w-3" />
+                    <MessageCircle className="h-3 w-3 " />
                   </Button>
                 </div>
               </div>
@@ -164,16 +164,16 @@ export function ClinicTeamWidget({
       onDrag={handleDrag}
       nodeRef={nodeRef}
     >
-      <Card ref={nodeRef} className={cn("shadow-sm hover:shadow transition-shadow duration-300 border border-primary/20 z-50", className)}>
+      <Card ref={nodeRef} className={cn("shadow-sm hover:shadow transition-shadow duration-300 border border-[#333] z-50 bg-[#1f1f1f] ", className)}>
         <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-primary rounded-full drag-handle cursor-move">
-                <GripVertical className="h-4 w-4 text-white" />
+              <div className="p-2 bg-[#257450] rounded-full drag-handle cursor-move">
+                <GripVertical className="h-4 w-4 text-white " />
               </div>
               <div>
-                <h4 className="text-sm font-semibold">{primaryContact.name}</h4>
-                <p className="text-xs text-muted-foreground">{primaryContact.role}</p>
+                <h4 className="text-sm font-semibold text-white">{primaryContact.name}</h4>
+                <p className="text-xs text-[#64ce9e]">{primaryContact.role}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -183,10 +183,10 @@ export function ClinicTeamWidget({
                     <Button 
                       variant="default" 
                       size="sm" 
-                      className="h-8 px-3"
+                      className="h-8 px-3 bg-[#257450] "
                       onClick={() => handleCall(primaryContact.phoneNumber)}
                     >
-                      <Phone className="h-3 w-3 mr-1" />
+                      <Phone className="h-3 w-3 mr-0" />
                       Call
                     </Button>
                   </TooltipTrigger>
@@ -198,7 +198,7 @@ export function ClinicTeamWidget({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-7 w-7 p-0"
+                className="h-7 w-7 p-0 text-white hover:bg-[#cde4da]"
                 onClick={handleToggleExpand}
               >
                 <ChevronDown className="h-3 w-3" />

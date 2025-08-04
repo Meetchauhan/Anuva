@@ -223,7 +223,7 @@ export function groupSymptomsByCategory(symptoms: any[]): Record<string, any[]> 
  */
 export function getAge(dateOfBirth: Date | string): number {
   const birthDate = typeof dateOfBirth === "string" ? new Date(dateOfBirth) : dateOfBirth;
-  if (isNaN(birthDate.getTime())) return 0;
+  if (isNaN(birthDate?.getTime())) return 0;
 
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();

@@ -22,39 +22,45 @@ import {
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
 import { UserRole } from "@/types";
+import { useDispatch } from "react-redux";
+import { signupAdmin } from "@/features/adminAuthSlice";
+import { AppDispatch } from "@/store/store";
+import { toast } from "@/hooks/use-toast";
+import { navigate } from "wouter/use-browser-location";
 
 // Registration form schema
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  userName: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   fullName: z.string().min(1, "Full name is required"),
   email: z.string().email("Invalid email address"),
-  role: z.enum([UserRole.PROVIDER, UserRole.PATIENT, UserRole.CAREGIVER]),
+  // role: z.enum([UserRole.PROVIDER, UserRole.PATIENT, UserRole.CAREGIVER]),
   phoneNumber: z.string().optional(),
   speciality: z.string().optional(),
   licenseNumber: z.string().optional(),
-  relationToPatient: z.string().optional(),
+  // relationToPatient: z.string().optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const { register } = useAuth();
+  const { registerMutation } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
+      userName: "",
       password: "",
       fullName: "",
       email: "",
-      role: UserRole.PATIENT,
+      // role: UserRole.PATIENT,
       phoneNumber: "",
       speciality: "",
       licenseNumber: "",
-      relationToPatient: "",
+      // relationToPatient: "",
     },
   });
 
@@ -63,9 +69,24 @@ export function RegisterForm() {
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     setError(null);
+    
 
     try {
-      await register(data);
+      const response = await dispatch(signupAdmin(data)).unwrap();
+      if(response.status){
+        sessionStorage.setItem("adminAuthToken", response.token);
+        toast({
+          title: response.message,
+          description: "Please login to continue",  
+        });
+        navigate("/admin/dashboard");
+      }else{
+        toast({
+          title: "Registration failed",
+          description: response.message,
+        });
+      }
+      console.log("response", response);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -76,8 +97,8 @@ export function RegisterForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Create an account</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-2xl font-bold text-white">Create an account</h2>
+        <p className="text-sm  text-[#64ce9e]">
           Enter your information to create an account
         </p>
       </div>
@@ -92,15 +113,16 @@ export function RegisterForm() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="username"
+            name="userName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel className="text-white">Username</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter a username"
                     {...field}
                     disabled={isLoading}
+                    // className="placeholder:text-[#64ce9e] bg-black focus:outline-none focus-visible:ring-2 "
                   />
                 </FormControl>
                 <FormMessage />
@@ -113,7 +135,7 @@ export function RegisterForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="text-white">Password</FormLabel>
                 <FormControl>
                   <Input
                     type="password"
@@ -132,7 +154,7 @@ export function RegisterForm() {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel className="text-white">Full Name</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter your full name"
@@ -150,7 +172,7 @@ export function RegisterForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-white">Email</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
@@ -164,12 +186,12 @@ export function RegisterForm() {
             )}
           />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Role</FormLabel>
+                <FormLabel className="text-white">Role</FormLabel>
                 <Select
                   disabled={isLoading}
                   onValueChange={field.onChange}
@@ -189,16 +211,16 @@ export function RegisterForm() {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
-          {selectedRole === UserRole.PROVIDER && (
+          {/* {selectedRole === UserRole.PROVIDER && (
             <>
               <FormField
                 control={form.control}
                 name="speciality"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Speciality</FormLabel>
+                    <FormLabel className="text-white">Speciality</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="E.g., Neurology, Sports Medicine"
@@ -216,7 +238,7 @@ export function RegisterForm() {
                 name="licenseNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>License Number</FormLabel>
+                    <FormLabel className="text-white">License Number</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter your license number"
@@ -237,7 +259,7 @@ export function RegisterForm() {
               name="relationToPatient"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Relation to Patient</FormLabel>
+                  <FormLabel className="text-white">Relation to Patient</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="E.g., Parent, Spouse, Child"
@@ -249,14 +271,14 @@ export function RegisterForm() {
                 </FormItem>
               )}
             />
-          )}
+          )} */}
 
           <FormField
             control={form.control}
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number (Optional)</FormLabel>
+                <FormLabel className="text-white">Phone Number (Optional)</FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter your phone number"
@@ -269,7 +291,7 @@ export function RegisterForm() {
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full bg-[#257450] hover:bg-[#257450e6]" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating account...

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import axios from "axios"; // Import Axios
+import useUserAuth from "@/hooks/useUserAuth";
 
 import {
     Form,
@@ -19,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"; // Import Collapsible components
 import { SymptomTrajectory } from "@/components/charts/symptom-trajectory";
 import { useIntakeFormView } from "@/config/apiQueries";
+import { navigate } from "wouter/use-browser-location";
 
 interface MetaPatient {
     id: number;
@@ -72,8 +74,17 @@ export default function IntakeFormPage() {
     const params = new URLSearchParams(window.location.search);
     const defaultPatient = parseInt(params.get("patientID") || "0", 10);
     const defaultInjury = parseInt(params.get("injuryID") || "0", 10);
+    const userAuth = useUserAuth();
 
     const requestID = parseInt(params.get("requestID") || "0", 10);
+
+    // Redirect if user has already filled the intake form
+    useEffect(() => {
+        const user = (userAuth as any)?.user;
+        if (user && user.isIntakeFormFilled === true) {
+           navigate("/home");
+        }
+    }, [userAuth]);
 
     const form = useForm<MetaPatient & IntakeFormValues>({
         defaultValues: {
@@ -109,12 +120,27 @@ export default function IntakeFormPage() {
     });
 
     const [loading, setLoading] = useState(true);
+    const [checkingUserStatus, setCheckingUserStatus] = useState(true);
+
+    // Check user intake form status
+    useEffect(() => {
+        const user = (userAuth as any)?.user;
+        if (user) {
+            if (user.isIntakeFormFilled === true) {
+                window.location.href = "/home";
+            } else {
+                setCheckingUserStatus(false);
+            }
+        } else {
+            setCheckingUserStatus(false);
+        }
+    }, [userAuth]);
 
     useEffect(() => {
         async function loadForm() {
             setLoading(false);
             const data = await useIntakeFormView(requestID);
-            form.setValue("patientID" as any, data["id"])
+            form.setValue("patientID" as any, data["id"]);
 
             Object.entries(data).forEach(([key, value]) => {
                 try {
@@ -131,6 +157,8 @@ export default function IntakeFormPage() {
     }, [requestID]);
 
     const onSubmit = async (data: IntakeFormValues) => {
+        console.log("intake form data",data);
+        
         try {
             const resp = await fetch(`${window.location.origin}/api/v2/intake-form/${requestID}`, {
                 method: "POST",
@@ -142,7 +170,10 @@ export default function IntakeFormPage() {
             }
             const result = await resp.json();
             const patientID = result["patientID"]
-            alert(`Form submitted successfully. Patient ID: ${patientID}`);
+            
+            // After successful submission, redirect to home page
+            // The user's isIntakeFormFilled status should be updated by your third-party API
+            window.location.href = "/home";
         } catch (err: any) {
             alert(err.message || "Submission error");
         }
@@ -189,7 +220,7 @@ export default function IntakeFormPage() {
         "nervousOrAnxious",
     ] as const;
 
-    if (loading) {
+    if (loading || checkingUserStatus) {
         return <div>Loading...</div>;
     }
 

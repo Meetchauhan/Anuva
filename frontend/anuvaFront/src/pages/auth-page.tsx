@@ -38,13 +38,13 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#121212]">
       {/* Left Column - Auth Form */}
       <div className="flex-1 flex items-center justify-center p-6 md:p-10 lg:p-20">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Rudra Health Anuva OS</h1>
-            <p className="text-muted-foreground">Concussion Management & Neurology EHR</p>
+            <h1 className="text-3xl font-bold mb-2 text-white">Rudra Health Anuva OS</h1>
+            <p className=" text-[#64ce9e]">Concussion Management & Neurology EHR</p>
           </div>
 
           <Tabs
@@ -52,14 +52,14 @@ export default function AuthPage() {
             onValueChange={(value) => setActiveTab(value as "login" | "register")}
             className="space-y-6"
           >
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
+            <TabsList className="grid grid-cols-2 w-full bg-[#1f1f1f]">
+              <TabsTrigger value="login" className="">Sign In</TabsTrigger>
               <TabsTrigger value="register">Create Account</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
               <div className="mb-4 p-3 bg-secondary/10 border border-secondary rounded-md">
-                <h3 className="font-medium text-sm mb-2">Demo Accounts (Password: password123)</h3>
+                <h3 className="font-medium text-sm mb-2 text-white">Demo Accounts (Password: password123)</h3>
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div className="p-2 bg-white rounded border border-primary">
                     <strong className="block text-primary">Provider</strong>
@@ -86,9 +86,9 @@ export default function AuthPage() {
       </div>
 
       {/* Right Column - Hero Section */}
-      <div className="flex-1 bg-primary/20 dark:bg-primary/30 hidden md:flex items-center justify-center p-10 shadow-inner">
+      <div className="flex-1 bg-[#25745033] bg-primary/20 dark:bg-primary/30 hidden md:flex items-center justify-center p-10 shadow-inner">
         <div className="max-w-lg text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white bg-primary px-4 py-2 rounded-lg shadow-md border border-primary-light">
+          <h2 className="text-3xl font-bold mb-6 text-white bg-primary px-4 py-2 rounded-lg shadow-md ">
             Rudra Health Anuva OS Platform
           </h2>
           <div className="space-y-6 text-lg">

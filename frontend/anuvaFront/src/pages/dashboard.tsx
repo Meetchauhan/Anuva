@@ -21,12 +21,16 @@ import Header from "@/components/layout/admin-header";
 import { PatientCombinedRecordV1_2 } from '@/types/index_v2'
 
 import { usePatientsData } from "@/config/apiQueries";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { fetchPatients } from "@/features/patientSlice";
 
 export default function Dashboard() {
   // Track the selected patient
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
   // State for support widget expanded status
   const [supportWidgetExpanded, setSupportWidgetExpanded] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   // Fetch dashboard stats
   const {
@@ -81,32 +85,37 @@ export default function Dashboard() {
   // Update document title
   useEffect(() => {
     document.title = "Dashboard | Anuva OS";
+
   }, []);
 
+  useEffect(()=>{
+    dispatch(fetchPatients());
+  }, [dispatch]);
+
   // Display loading state if everything is loading
-  if (statsLoading && patientsLoading) {
-    return (
-      <div className="p-4 md:p-6">
-        <Header title="Clinical Dashboard" />
-        <div className="text-center p-8 text-neutral-400">
-          Loading dashboard data...
-        </div>
-      </div>
-    );
-  }
+  // if (statsLoading && patientsLoading) {
+  //   return (
+  //     <div className="p-4 md:p-6">
+  //       <Header title="Clinical Dashboard" />
+  //       <div className="text-center p-8 text-neutral-400">
+  //         Loading dashboard data...
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Display error state if there's a critical error
-  if ((statsError || patientsError) && !stats && !patients) {
-    return (
-      <div className="p-4 md:p-6">
-        <Header title="Clinical Dashboard" />
-        <div className="text-center p-8 text-status-red">
-          Error loading dashboard: {statsError ? (statsError as Error).message :
-            patientsError ? (patientsError as Error).message : 'Unknown error'}
-        </div>
-      </div>
-    );
-  }
+  // if ((statsError || patientsError) && !stats && !patients) {
+  //   return (
+  //     <div className="p-4 md:p-6">
+  //       <Header title="Clinical Dashboard" />
+  //       <div className="text-center p-8 text-status-red">
+  //         Error loading dashboard: {statsError ? (statsError as Error).message :
+  //           patientsError ? (patientsError as Error).message : 'Unknown error'}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Get the selected patient by ID
   const selectedPatient = selectedPatientId && patients
@@ -143,47 +152,47 @@ export default function Dashboard() {
       />
 
       {/* Enhanced Clinical CRM Dashboard with Tabs */}
-      <Tabs defaultValue="patients" className="mb-6">
-        <TabsList className="mb-4 flex bg-muted rounded-sm p-1 overflow-x-auto">
+      <Tabs defaultValue="patients" className="mb-6 ">
+        <TabsList className="mb-4 flex bg-[#1f1f1f] rounded-sm p-1 overflow-x-auto">
           <TabsTrigger
             value="patients"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Patient Management
           </TabsTrigger>
           <TabsTrigger
             value="symptoms"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Symptom Analytics
           </TabsTrigger>
           <TabsTrigger
             value="treatments"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Treatment Analytics
           </TabsTrigger>
           <TabsTrigger
             value="cohort"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Cohort Analytics
           </TabsTrigger>
           <TabsTrigger
             value="schedule"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Calendar
           </TabsTrigger>
           <TabsTrigger
             value="ai"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             AI Documentation
           </TabsTrigger>
           <TabsTrigger
             value="widgets"
-            className="flex-shrink-0 px-4 py-2 text-foreground/80 data-[state=active]:text-primary-light data-[state=active]:bg-background rounded-sm"
+            className="flex-shrink-0 px-4 py-2 text-[#f2f2f2cc] data-[state=active]:text-[#f2f2f2cc] data-[state=active]:bg-black rounded-sm"
           >
             Custom Widgets
           </TabsTrigger>
@@ -200,8 +209,8 @@ export default function Dashboard() {
             />
 
             {/* Calendar View */}
-            <div className="bg-card rounded-lg shadow border border-border p-6">
-              <h2 className="text-xl font-semibold mb-4">Upcoming Appointments</h2>
+            <div className="bg-[#1f1f1f] rounded-lg shadow border border-[#262626] p-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">Upcoming Appointments</h2>
               <CalendarView />
             </div>
 

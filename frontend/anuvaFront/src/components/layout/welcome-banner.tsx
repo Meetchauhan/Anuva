@@ -1,17 +1,27 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import type { Appointment, User } from "@shared/schema";
+import useUserAuth from "@/hooks/useUserAuth";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { useEffect } from "react";
+import { getUser } from "@/features/authSlice";
 
 export default function WelcomeBanner() {
-  const { user } = useAuth() as { user: User | undefined; isLoading: boolean; isAuthenticated: boolean };
-  const auth = useAuth();
-  console.log("auth", auth);
+  // const { user } = useAuth() as { user: User | undefined; isLoading: boolean; isAuthenticated: boolean };
+  // const auth = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
+  const user = useUserAuth();
+  useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch]);
+  console.log("auth", user);
   const { data: upcomingAppointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments/upcoming"],
   });
 
   const nextAppointment = upcomingAppointments[0];
-  const firstName = user?.firstName || "Patient";
+  const firstName = user?.user?.firstName || "Patient";
 
   return (
     <div className="from-blue-600 to-blue-700 text-white py-8 bg-[#1F5A42]">

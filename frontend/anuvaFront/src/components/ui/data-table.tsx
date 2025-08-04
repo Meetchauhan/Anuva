@@ -134,7 +134,7 @@ export function DataTable<TData>({
                       setCurrentPage(currentPage - 1);
                     }
                   }}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                  className={currentPage === 1 ? "pointer-events-none bg-[#cde4da] opacity-50" : "bg-[#cde4da] text-[#164630]"}
                 />
               </PaginationItem>
               
@@ -150,6 +150,7 @@ export function DataTable<TData>({
                         setCurrentPage(page as number);
                       }}
                       isActive={currentPage === page}
+                      className={currentPage === page ? "bg-[#cde4da] text-[#164630]" : "text-white "}
                     >
                       {page}
                     </PaginationLink>
@@ -166,7 +167,7 @@ export function DataTable<TData>({
                       setCurrentPage(currentPage + 1);
                     }
                   }}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                  className={currentPage === totalPages ? "pointer-events-none bg-[#cde4da] opacity-50" : "bg-[#cde4da] text-[#164630]"}
                 />
               </PaginationItem>
             </PaginationContent>

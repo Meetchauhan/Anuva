@@ -23,6 +23,10 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { User, Phone, Mail, CreditCard, Send, Calendar, Clock } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store/store';
+import { createPatient, fetchPatients } from '@/features/patientSlice';
+import { usePatient } from '@/hooks/usePatient';
 
 const addPatientSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -30,6 +34,7 @@ const addPatientSchema = z.object({
   dateOfBirth: z.string().min(1, 'Date of birth is required'),
   phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
   email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   insuranceProvider: z.string().min(1, 'Insurance provider is required'),
 });
 
@@ -44,6 +49,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
   const [isSendingIntake, setIsSendingIntake] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch<AppDispatch>();
 
   // Fetch next available appointments when dialog opens
   const { data: nextAppointments, isLoading: appointmentsLoading } = useQuery<{
@@ -65,47 +71,51 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
       lastName: '',
       dateOfBirth: '',
       phoneNumber: '',
-      email: '',
+      email: '',   
+      password: '',
       insuranceProvider: '',
     },
   });
 
-  const createPatientMutation = useMutation({
-    mutationFn: async (data: AddPatientFormData) => {
-      const response = await apiRequest('POST', '/api/patients', {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        contactPhone: data.phoneNumber,
-        contactEmail: data.email,
-        insuranceProvider: data.insuranceProvider,
-        dateOfBirth: data.dateOfBirth,
-        gender: 'Unknown',
-        emergencyContactName: 'TBD',
-        emergencyContactPhone: 'TBD',
-        emergencyContactRelation: 'TBD',
-      });
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/patients/with-risk'] });
-      
-      toast({
-        title: 'Patient Added Successfully',
-        description: `${form.getValues('firstName')} ${form.getValues('lastName')} has been added to the system.`,
-      });
+  const { loading, error } = usePatient();
 
-      form.reset();
-      onOpenChange(false);
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Error Adding Patient',
-        description: error.message || 'Failed to add patient. Please try again.',
-        variant: 'destructive',
-      });
-    },
-  });
+  // const createPatientMutation = useMutation({
+  //   mutationFn: async (data: AddPatientFormData) => {
+  //     const response = await apiRequest('POST', '/api/patients', {
+  //       firstName: data.firstName,
+  //       lastName: data.lastName,
+  //       contactPhone: data.phoneNumber,
+  //       contactEmail: data.email,
+  //       password: data.password,
+  //       insuranceProvider: data.insuranceProvider,
+  //       dateOfBirth: data.dateOfBirth,
+  //       gender: 'Unknown',
+  //       emergencyContactName: 'TBD',
+  //       emergencyContactPhone: 'TBD',
+  //       emergencyContactRelation: 'TBD',
+  //     });
+  //     return response;
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
+  //     queryClient.invalidateQueries({ queryKey: ['/api/patients/with-risk'] });
+      
+  //     toast({
+  //       title: 'Patient Added Successfully',
+  //       description: `${form.getValues('firstName')} ${form.getValues('lastName')} has been added to the system.`,
+  //     });
+
+  //     form.reset();
+  //     onOpenChange(false);
+  //   },
+  //   onError: (error: any) => {
+  //     toast({
+  //       title: 'Error Adding Patient',
+  //       description: error.message || 'Failed to add patient. Please try again.',
+  //       variant: 'destructive',
+  //     });
+  //   },
+  // });
 
   const handleSendIntakeForm = async () => {
     const formData = form.getValues();
@@ -139,19 +149,45 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
     }
   };
 
-  const onSubmit = (data: AddPatientFormData) => {
-    createPatientMutation.mutate(data);
+  const onSubmit = async (data: AddPatientFormData) => {
+    try {
+      const result = await dispatch(createPatient(data)).unwrap();
+      console.log("result", result);
+      
+      if(result?.status){
+        await dispatch(fetchPatients()).unwrap();
+        form.reset();
+        onOpenChange(false);
+        toast({
+          title: "Patient Added",
+          description: "Successfully Patient Added.",
+        });
+      } else {
+        toast({
+          title: "Error Adding Patient",
+          description: result?.message || "Failed to add patient. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error creating patient:", error);
+      toast({
+        title: "Error Adding Patient",
+        description:  "Failed to add patient. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-[#121212]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <User className="h-5 w-5 text-white" />
             Add New Patient
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-[#64ce9e]">
             Quick patient registration with appointment scheduling
           </DialogDescription>
         </DialogHeader>
@@ -160,8 +196,8 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
           {/* Left Column - Patient Information */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
-              <User className="h-4 w-4 text-primary" />
-              <h3 className="font-semibold">Patient Information</h3>
+              <User className="h-4 w-4 text-[#257450]" />
+              <h3 className="font-semibold text-white">Patient Information</h3>
             </div>
             
             <Form {...form}>
@@ -172,12 +208,12 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                     name="firstName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel className="text-white">First Name</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter first name" 
                             {...field} 
-                            className="bg-background"
+                            className="bg-[#121212] text-white placeholder:text-[#64ce9e]"
                           />
                         </FormControl>
                         <FormMessage />
@@ -190,12 +226,12 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                     name="lastName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel className="text-white">Last Name</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Enter last name" 
                             {...field} 
-                            className="bg-background"
+                            className="bg-[#121212] text-white placeholder:text-[#64ce9e]"
                           />
                         </FormControl>
                         <FormMessage />
@@ -209,13 +245,17 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                   name="dateOfBirth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date of Birth</FormLabel>
+                      
+                      <FormLabel className="text-white flex gap-2">
+                        Date of Birth</FormLabel>
                       <FormControl>
+                        
                         <Input 
                           type="date"
                           {...field} 
-                          className="bg-background"
+                          className="bg-[#121212] text-white placeholder:text-[#64ce9e] [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:contrast-100"
                         />
+                        
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -227,13 +267,13 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel className="text-white">Phone Number</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
                           <Input 
                             placeholder="(555) 123-4567" 
-                            className="pl-10 bg-background" 
+                            className="pl-10 bg-[#121212] text-white placeholder:text-[#64ce9e]" 
                             {...field} 
                           />
                         </div>
@@ -248,14 +288,14 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel className="text-white">Email Address</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
                           <Input 
                             type="email"
                             placeholder="patient@example.com" 
-                            className="pl-10 bg-background" 
+                            className="pl-10 bg-[#121212] text-white placeholder:text-[#64ce9e]" 
                             {...field} 
                           />
                         </div>
@@ -264,19 +304,37 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                     </FormItem>
                   )}
                 />
+                 <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-white">Password</FormLabel>
+                        <FormControl>
+                          <Input 
+                          type='password'
+                            placeholder="Enter password" 
+                            {...field} 
+                            className="bg-[#121212] text-white placeholder:text-[#64ce9e]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                 <FormField
                   control={form.control}
                   name="insuranceProvider"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Insurance Provider</FormLabel>
+                      <FormLabel className="text-white">Insurance Provider</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <CreditCard className="absolute left-3 top-3 h-4 w-4 text-neutral-400" />
                           <Input 
                             placeholder="e.g., Blue Cross Blue Shield" 
-                            className="pl-10 bg-background" 
+                            className="pl-10 bg-[#121212] text-white placeholder:text-[#64ce9e]" 
                             {...field} 
                           />
                         </div>
@@ -289,10 +347,10 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                 <div className="flex flex-col gap-3 pt-4">
                   <Button 
                     type="submit" 
-                    className="w-full"
-                    disabled={createPatientMutation.isPending}
+                    className="w-full bg-[#257450] text-white"
+                    disabled={loading}
                   >
-                    {createPatientMutation.isPending ? 'Adding Patient...' : 'Add Patient'}
+                    {loading ? 'Adding Patient...' : 'Add Patient'}
                   </Button>
                   
                   <Button 
@@ -314,7 +372,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-primary" />
-              <h3 className="font-semibold">Available Appointments</h3>
+              <h3 className="font-semibold text-white">Available Appointments</h3>
             </div>
 
             {appointmentsLoading ? (
@@ -375,6 +433,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                 </div>
               </div>
             )}
+            
 
             {/* Compact scheduling note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-2">

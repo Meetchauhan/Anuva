@@ -37,7 +37,7 @@ export function useAuth() {
 
 
 export function useUserAuth(){
- const isToken = sessionStorage.getItem('token') ? true : false;
+ const isToken = sessionStorage.getItem('authToken') ? true : false;
  return {
   isToken,
  }
