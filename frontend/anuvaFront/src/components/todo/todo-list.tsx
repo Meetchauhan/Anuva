@@ -9,11 +9,27 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import SimpleQuestionnaire from "@/components/forms/simple-questionnaire";
 import type { IntakeForm } from "@shared/schema";
+import useUserAuth from "@/hooks/useUserAuth";
+import { navigate } from "wouter/use-browser-location";
 
 export default function TodoList() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedForm, setSelectedForm] = useState<IntakeForm | null>(null);
+  const intakeForm = useUserAuth();
+  console.log("intakeForm", intakeForm?.user?.isPatientInfoFormCompleted);
+
+  // Create array of form completion status objects
+  const formCompletionStatus = intakeForm?.user ? Object.entries(intakeForm.user)
+    .filter(([key]) => key.endsWith('FormCompleted'))
+    .map(([key, value]) => ({
+      fieldName: key,
+      isCompleted: value as boolean,
+      formName: key.replace('FormCompleted', '').replace(/^is/, '').replace(/([A-Z])/g, ' $1').trim() + ' intake form',
+      formUrl: key.replace('FormCompleted', '').replace(/^is/, '').replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '')
+    })) : [];
+
+  console.log("Form Completion Status:", formCompletionStatus);
 
   const { data: intakeForms = [], isLoading } = useQuery<IntakeForm[]>({
     queryKey: ["/api/intake-forms"],
@@ -117,8 +133,8 @@ export default function TodoList() {
     );
   };
 
-  const pendingForms = intakeForms.filter(form => form.status !== "completed");
-  const completedForms = intakeForms.filter(form => form.status === "completed");
+  const pendingForms = formCompletionStatus.filter(form => form.isCompleted === false);
+  const completedForms = formCompletionStatus.filter(form => form.isCompleted === true);
 
   if (isLoading) {
     return (
@@ -170,7 +186,7 @@ export default function TodoList() {
                   {getPriorityIcon(form.priority)}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{form.title}</h4>
+                  <h4 className="font-semibold text-gray-900">{form.formName}</h4>
                   <p className="text-sm text-gray-600">{form.description}</p>
                   {form.dueDate && (
                     <p className="text-xs text-gray-500 mt-1">
@@ -186,7 +202,7 @@ export default function TodoList() {
                 <div className="flex items-center space-x-3">
                   {getStatusBadge(form)}
                   <Button
-                    onClick={() => setSelectedForm(form)}
+                    onClick={() => navigate(form.formUrl)}
                     className="hover:bg-[#1F5A42]/90 text-white bg-[#1F5A42]"
                   >
                     Start Form
@@ -206,7 +222,7 @@ export default function TodoList() {
                 <CheckCircle className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900">{form.title}</h4>
+                <h4 className="font-semibold text-gray-900">{form.fieldName}</h4>
                 <p className="text-sm text-gray-600">{form.description}</p>
                 {form.completedAt && (
                   <p className="text-xs text-green-600 mt-1">

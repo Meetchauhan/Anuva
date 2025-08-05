@@ -34,7 +34,7 @@ const addPatientSchema = z.object({
   dateOfBirth: z.string().min(1, 'Date of birth is required'),
   phoneNumber: z.string().min(10, 'Phone number must be at least 10 digits'),
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  // password: z.string().min(6, 'Password must be at least 6 characters'),
   insuranceProvider: z.string().min(1, 'Insurance provider is required'),
 });
 
@@ -72,7 +72,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
       dateOfBirth: '',
       phoneNumber: '',
       email: '',   
-      password: '',
+      // password: '',
       insuranceProvider: '',
     },
   });
@@ -304,7 +304,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                     </FormItem>
                   )}
                 />
-                 <FormField
+                 {/* <FormField
                     control={form.control}
                     name="password"
                     render={({ field }) => (
@@ -321,7 +321,7 @@ export function AddPatientForm({ open, onOpenChange }: AddPatientFormProps) {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                 <FormField
                   control={form.control}

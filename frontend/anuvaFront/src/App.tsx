@@ -39,6 +39,7 @@ import UserSettings from "@/pages/settings"; // To avoid conflict with admin Set
 import { Provider } from "react-redux";
 import  store  from "./store/store";
 import CreatePasswordPage from "./pages/createPasswordPage";
+import PatientInfoFormPage from "./pages/patient-info-form-page";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -54,11 +55,11 @@ function AutoRedirect() {
     } else if (userToken) {
       // Check if user has filled intake form before redirecting to home
       const user = (userAuth as any)?.user;
-      if (user && user?.isIntakeFormFilled === false) {
-        setLocation("/intake-form");
-      } else {
+      // if (user && user?.isIntakeFormFilled === false) {
+      //   setLocation("/intake-form");
+      // } else {
         setLocation("/home");
-      }
+      // }
     } else {
       setLocation("/");
     }
@@ -82,46 +83,46 @@ function AppWithConditionalLayout({ children }: { children: React.ReactNode }) {
 }
 
 // Component to handle intake form redirection
-function IntakeFormRedirect({ children }: { children: React.ReactNode }) {
-  const [location, setLocation] = useLocation();
-  const userAuth = useUserAuth();
-  const [isChecking, setIsChecking] = useState(true);
-  const [canAccess, setCanAccess] = useState(false);
+// function IntakeFormRedirect({ children }: { children: React.ReactNode }) {
+//   const [location, setLocation] = useLocation();
+//   const userAuth = useUserAuth();
+//   const [isChecking, setIsChecking] = useState(true);
+//   const [canAccess, setCanAccess] = useState(false);
   
-  useEffect(() => {
-    // Check if user is authenticated and has not filled intake form
-    const user = (userAuth as any)?.user;
-    console.log("IntakeFormRedirect - userAuth:", userAuth);
-    console.log("IntakeFormRedirect - user:", user);
-    console.log("IntakeFormRedirect - isIntakeFormFilled:", user?.isIntakeFormFilled);
+//   useEffect(() => {
+//     // Check if user is authenticated and has not filled intake form
+//     const user = (userAuth as any)?.user;
+//     console.log("IntakeFormRedirect - userAuth:", userAuth);
+//     console.log("IntakeFormRedirect - user:", user);
+//     console.log("IntakeFormRedirect - isIntakeFormFilled:", user?.isIntakeFormFilled);
     
-    if (user) {
-      if (user?.isIntakeFormFilled === false && location !== "/intake-form") {
-        console.log("Redirecting to intake form");
-        setLocation("/intake-form");
-        return;
-      } else {
-        setCanAccess(true);
-      }
-    } else {
-      setCanAccess(true);
-    }
+//     if (user) {
+//       if (user?.isIntakeFormFilled === false && location !== "/intake-form") {
+//         console.log("Redirecting to intake form");
+//         setLocation("/intake-form");
+//         return;
+//       } else {
+//         setCanAccess(true);
+//       }
+//     } else {
+//       setCanAccess(true);
+//     }
     
-    setIsChecking(false);
-  }, [userAuth, setLocation, location]);
+//     setIsChecking(false);
+//   }, [userAuth, setLocation, location]);
   
-  // Show loading while checking
-  if (isChecking) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+//   // Show loading while checking
+//   if (isChecking) {
+//     return (
+//       <div className="flex items-center justify-center min-h-screen">
+//         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+//       </div>
+//     );
+//   }
   
-  // Only render children if user can access the page
-  return canAccess ? <>{children}</> : null;
-}
+//   // Only render children if user can access the page
+//   return canAccess ? <>{children}</> : null;
+// }
 
 // User Router logic
 function UserRouter() {
@@ -175,23 +176,26 @@ function UserRouter() {
       {/* </AppLayout> */}
       
       {/* User Private Routes - Wrap with intake form check */}
-      <UserPrivateRoute path="/intake-form">
+      {/* <UserPrivateRoute path="/intake-form">
         <IntakeFormPage />
-      </UserPrivateRoute>
+      </UserPrivateRoute> */}
       <UserPrivateRoute path="/home">
-        <IntakeFormRedirect>
+        {/* <IntakeFormRedirect> */}
           <Home />
-        </IntakeFormRedirect>
+        {/* </IntakeFormRedirect> */}
       </UserPrivateRoute>
       <UserPrivateRoute path="/analytics">
-        <IntakeFormRedirect>
+        {/* <IntakeFormRedirect> */}
           <Analytics />
-        </IntakeFormRedirect>
+        {/* </IntakeFormRedirect> */}
       </UserPrivateRoute>
       <UserPrivateRoute path="/settings">
-        <IntakeFormRedirect>
+        {/* <IntakeFormRedirect> */}
           <UserSettings />
-        </IntakeFormRedirect>
+        {/* </IntakeFormRedirect> */}
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/patient-info">
+        <PatientInfoFormPage />
       </UserPrivateRoute>
       
       {/* Catch all route */}

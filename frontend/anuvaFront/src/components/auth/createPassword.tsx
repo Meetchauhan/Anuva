@@ -14,19 +14,25 @@ import { useLocation } from "wouter";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { authLogin, getUser } from "@/features/authSlice";
+import { axiosPublic } from "@/lib/axios";
 
 const createPasswordSchema = z.object({
   patientId: z.string().min(1, "Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
   confirmPassword: z.string().min(1, "Confirm password is required"),
+}).superRefine((data, ctx) => {
+  if (data.password !== data.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Passwords do not match",
+      path: ["confirmPassword"],
+    });
+  }
 });
 
 type CreatePasswordFormData = z.infer<typeof createPasswordSchema>;
 
-interface LoginFormProps {
-  onLoginSuccess: () => void;
-  onSwitchToSignup: () => void;
-}
+
 
 export default function CreatePassword() {
   const [, navigate] = useLocation();
@@ -36,6 +42,16 @@ export default function CreatePassword() {
   const dispatch = useDispatch<AppDispatch>();
 
   // console.log("isToken---", auth);
+
+  const handleCreatePassword = async (data: CreatePasswordFormData) => {
+    const response = await axiosPublic.post(`/api/auth/reset-password`, {
+        patientId: data.patientId,
+        password: data.password,
+    
+    });
+    console.log('Create password response:', response);
+    return response.data;
+  }
   
   
   const { register, handleSubmit, formState: { errors } } = useForm<CreatePasswordFormData>({
@@ -48,20 +64,12 @@ export default function CreatePassword() {
     try {
       console.log('Attempting create password with:', { patientId: data.patientId, password: '***' });
       
-      const result = await dispatch(authLogin(data)).unwrap();
+    //   const result = await dispatch(authLogin(data)).unwrap();
+    const result = await handleCreatePassword(data);
   
       console.log('Create password result:', result);
-      sessionStorage.setItem('authToken', result.token);
            
-      if (result?.token) {
-        navigate("/home");
-        dispatch(getUser());
-        // sessionStorage.setItem('authToken', result.token);
-        console.log('Token set in sessionStorage:', result.token);
-      } else {
-        console.log('No token in response:', result);
-      }
-
+        navigate("/auth");
 
       toast({
         title: "Create Password",
@@ -130,6 +138,23 @@ export default function CreatePassword() {
             )}
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              {...register("confirmPassword")}
+              className={errors.confirmPassword ? "border-red-500" : ""}
+            />
+                {errors.confirmPassword && (
+              <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+            )}
+          </div>
+
           <Button
             type="submit"
             className="w-full bg-[#1F5A42] hover:bg-[#154734] text-white"
@@ -141,17 +166,17 @@ export default function CreatePassword() {
 
 
           <div className="text-center space-y-2">
-            <button
+            {/* <button
               type="button"
               className="text-sm text-gray-500 hover:text-[#1F5A42] underline"
             >
               Forgot your password?
-            </button>
+            </button> */}
             
             <div>
               <button
                 type="button"
-                // onClick={onSwitchToSignup}
+                onClick={() => navigate("/auth")}
                 className="text-sm text-[#1F5A42] hover:text-[#154734] underline"
               >
                 Already have an account? Sign in 
