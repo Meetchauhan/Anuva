@@ -3,13 +3,15 @@ import adminAuthReducer from "@/features/adminAuthSlice";
 import authReducer from "@/features/authSlice";
 import patientReducer from "@/features/patientSlice";
 import intakeformReducer from "@/features/intakeformSlice";
+import patientInfoReducer from "@/features/intakeFormSlice/patientInfoSlice";
 
 const store = configureStore({
   reducer: {
     adminAuth: adminAuthReducer,  
     auth: authReducer,
     patient: patientReducer,
-    intakeform: intakeformReducer,
+    intakeform: intakeformReducer,  
+    patientInfo: patientInfoReducer,
   },
 });
 

@@ -39,7 +39,8 @@ import UserSettings from "@/pages/settings"; // To avoid conflict with admin Set
 import { Provider } from "react-redux";
 import  store  from "./store/store";
 import CreatePasswordPage from "./pages/createPasswordPage";
-import PatientInfoFormPage from "./pages/patient-info-form-page";
+
+import PatientInfoPage from "./pages/patient-info-page";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -195,7 +196,7 @@ function UserRouter() {
         {/* </IntakeFormRedirect> */}
       </UserPrivateRoute>
       <UserPrivateRoute path="/patient-info">
-        <PatientInfoFormPage />
+        <PatientInfoPage />
       </UserPrivateRoute>
       
       {/* Catch all route */}

@@ -18,16 +18,20 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/store/store"
+import { patientInfoForm } from "@/features/intakeFormSlice/patientInfoSlice"
+import { toast } from "@/hooks/use-toast"
+import { navigate } from "wouter/use-browser-location"
 
 // Zod schema for patient information validation
 const patientInfoSchema = z.object({
-  patientId: z.string().min(1, "Patient ID is required"),
   fullName: z.string().min(1, "Full name is required").max(100, "Full name must be less than 100 characters"),
   dateOfExamination: z.date({
     required_error: "Date of examination is required",
   }),
   race: z.string().min(1, "Race is required").max(50, "Race must be less than 50 characters"),
-  maritalStatus: z.enum(["Single", "Married", "Widowed", "Divorced"], {
+  maritalStatus: z.enum(["single", "married", "widowed", "divorced"], {
     required_error: "Marital status is required",
   }),
   numberOfChildren: z.number().min(0, "Number of children cannot be negative").max(20, "Number of children seems unrealistic"),
@@ -44,13 +48,14 @@ const patientInfoSchema = z.object({
 type PatientInfoFormData = z.infer<typeof patientInfoSchema>
 
 const PatientInfo = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const form = useForm<PatientInfoFormData>({
     resolver: zodResolver(patientInfoSchema),
     defaultValues: {
       fullName: "",
       dateOfExamination: new Date(),
       race: "",
-      maritalStatus: "Single",
+      maritalStatus: "single",
       numberOfChildren: 0,
       hearingImpairment: false,
       hearingAids: false,
@@ -63,10 +68,28 @@ const PatientInfo = () => {
     },
   })
 
-  const onSubmit = (data: PatientInfoFormData) => {
-    console.log("Patient Info Form Data:", data)
-    // Here you would typically send the data to your API
-    // For now, we'll just log it to the console
+  const onSubmit = async (data: PatientInfoFormData) => {
+    // Format the date to YYYY-MM-DD format
+    const formattedData = {
+      ...data,
+      dateOfExamination: format(data.dateOfExamination, 'yyyy-MM-dd')
+    }
+    console.log("Patient Info Form Data:", formattedData)
+    const response = await dispatch(patientInfoForm(formattedData)).unwrap()
+    console.log("Response:", response)
+    if(response.status) {
+      form.reset()
+      navigate("/home")
+      toast({
+        title: "Patient information submitted successfully",
+        description: "Patient information has been submitted successfully",
+      })
+    } else {
+      toast({
+        title: "Failed to submit patient information",
+        description: "Failed to submit patient information",
+      })
+    }
   }
 
   return (
@@ -112,7 +135,7 @@ const PatientInfo = () => {
                               <Button
                                 variant={"outline"}
                                 className={cn(
-                                  "w-full pl-3 text-left font-normal",
+                                  "w-full pl-3 text-left font-normal hover:bg-white hover:text-black",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -130,9 +153,9 @@ const PatientInfo = () => {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                              }
+                              // disabled={(date) =>
+                              //   date > new Date() || date < new Date("1900-01-01")
+                              // }
                               initialFocus
                             />
                           </PopoverContent>
@@ -150,22 +173,22 @@ const PatientInfo = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Race *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange}>
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select race" />
+                            <SelectTrigger className="bg-white text-black">
+                              <SelectValue className="text-black hover:bg-white hover:text-black" placeholder="Select race" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="White">White</SelectItem>
-                            <SelectItem value="Black or African American">Black or African American</SelectItem>
-                            <SelectItem value="Hispanic or Latino">Hispanic or Latino</SelectItem>
-                            <SelectItem value="Asian">Asian</SelectItem>
-                            <SelectItem value="Native American or Alaska Native">Native American or Alaska Native</SelectItem>
-                            <SelectItem value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</SelectItem>
-                            <SelectItem value="Multiracial">Multiracial</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                            <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                          <SelectContent className="bg-white">
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="White">White</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Black or African American">Black or African American</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Hispanic or Latino">Hispanic or Latino</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Asian">Asian</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Native American or Alaska Native">Native American or Alaska Native</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Multiracial">Multiracial</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Other">Other</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="Prefer not to say">Prefer not to say</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -179,17 +202,17 @@ const PatientInfo = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Marital Status *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={'single'}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-white text-black">
                               <SelectValue placeholder="Select marital status" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Single">Single</SelectItem>
-                            <SelectItem value="Married">Married</SelectItem>
-                            <SelectItem value="Widowed">Widowed</SelectItem>
-                            <SelectItem value="Divorced">Divorced</SelectItem>
+                          <SelectContent className="bg-white">
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="single">Single</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="married">Married</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="widowed">Widowed</SelectItem>
+                            <SelectItem className="text-black bg-white hover:bg-gray-100 hover:text-black border-none" value="divorced">Divorced</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />

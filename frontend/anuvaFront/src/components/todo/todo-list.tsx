@@ -127,7 +127,7 @@ export default function TodoList() {
     }
 
     return (
-      <Badge variant="outline" className="bg-gray-100 text-gray-800">
+      <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
         Pending
       </Badge>
     );
@@ -179,7 +179,7 @@ export default function TodoList() {
           ) : (
             pendingForms.map((form) => (
               <div
-                key={form.id}
+                key={form.formUrl}
                 className={`flex items-center p-4 border rounded-lg ${getPriorityColor(form.priority, form.status)}`}
               >
                 <div className="flex-shrink-0 mr-4">
@@ -187,8 +187,8 @@ export default function TodoList() {
                 </div>
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900">{form.formName}</h4>
-                  <p className="text-sm text-gray-600">{form.description}</p>
-                  {form.dueDate && (
+                  {/* <p className="text-sm text-gray-600">{form.description}</p> */}
+                  {/* {form.dueDate && (
                     <p className="text-xs text-gray-500 mt-1">
                       Due: {new Date(form.dueDate).toLocaleDateString('en-US', {
                         weekday: 'short',
@@ -197,7 +197,7 @@ export default function TodoList() {
                         day: 'numeric'
                       })}
                     </p>
-                  )}
+                  )} */}
                 </div>
                 <div className="flex items-center space-x-3">
                   {getStatusBadge(form)}
@@ -215,20 +215,20 @@ export default function TodoList() {
           {/* Completed forms */}
           {completedForms.map((form) => (
             <div
-              key={form.id}
+              key={form.formUrl}
               className="flex items-center p-4 border border-green-200 bg-green-50 rounded-lg opacity-75"
             >
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-600 mr-4 flex items-center justify-center">
                 <CheckCircle className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900">{form.fieldName}</h4>
-                <p className="text-sm text-gray-600">{form.description}</p>
+                <h4 className="font-semibold text-gray-900">{form.formName}</h4>
+                {/* <p className="text-sm text-gray-600">{form.description}</p>
                 {form.completedAt && (
                   <p className="text-xs text-green-600 mt-1">
                     Completed on {new Date(form.completedAt).toLocaleDateString('en-US')}
                   </p>
-                )}
+                )} */}
               </div>
               <div className="flex items-center space-x-3">
                 <Badge variant="secondary" className="bg-green-100 text-green-800">
