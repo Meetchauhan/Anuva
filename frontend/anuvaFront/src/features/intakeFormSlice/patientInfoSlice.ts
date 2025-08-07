@@ -2,7 +2,7 @@ import { axiosPrivate } from "@/lib/axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  patientInfo: null,
+  // patientInfo: null,
   loading: false,
   error: null as string | null,
 };
@@ -23,7 +23,7 @@ const patientInfoSlice = createSlice({
         state.loading = true;
     });
     builder.addCase(patientInfoForm.fulfilled, (state, action) => {
-      state.patientInfo = action.payload;
+      // state.patientInfo = action.payload;
       state.loading = false;
     });
     builder.addCase(patientInfoForm.rejected, (state, action) => {

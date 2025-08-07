@@ -2,7 +2,6 @@ import { ReactNode, useEffect, useState } from "react";
 import { Route, useLocation } from "wouter";
 import { Loader2 } from "lucide-react";
 import useAdminAuth from "@/hooks/useAdminAuth";
-import useUserAuth from "@/hooks/useUserAuth";
 
 interface PrivateRouteProps {
   path: string;
@@ -12,10 +11,7 @@ interface PrivateRouteProps {
 
 export function PrivateRoute({ path, children, type }: PrivateRouteProps) {
   const [, setLocation] = useLocation();
-  const adminAuth = useAdminAuth();
-  const userAuth = useUserAuth();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  console.log("userAuth", userAuth);
 
   const getAuthToken = () => {
     if (typeof window !== "undefined") {

@@ -26,7 +26,7 @@ export default function TodoList() {
       fieldName: key,
       isCompleted: value as boolean,
       formName: key.replace('FormCompleted', '').replace(/^is/, '').replace(/([A-Z])/g, ' $1').trim() + ' intake form',
-      formUrl: key.replace('FormCompleted', '').replace(/^is/, '').replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '')
+      formUrl: key.replace('FormCompleted', '').replace(/^is/, '').replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '') + '-intake-form'
     })) : [];
 
   console.log("Form Completion Status:", formCompletionStatus);

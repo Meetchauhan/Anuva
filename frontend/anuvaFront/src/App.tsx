@@ -39,8 +39,10 @@ import UserSettings from "@/pages/settings"; // To avoid conflict with admin Set
 import { Provider } from "react-redux";
 import  store  from "./store/store";
 import CreatePasswordPage from "./pages/createPasswordPage";
-
-import PatientInfoPage from "./pages/patient-info-page";
+import PatientInfoIntakeForm from "./pages/patient-info-intake-form";
+import InjuryIntakeForm from "./pages/injury-intake-form";
+import SymptomChecklistIntakeForm from "./pages/symptomChecklist-intale-form";
+import AdditionalSymptomIntakeForm from "./pages/additionalSymptom-intake-form";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -195,10 +197,18 @@ function UserRouter() {
           <UserSettings />
         {/* </IntakeFormRedirect> */}
       </UserPrivateRoute>
-      <UserPrivateRoute path="/patient-info">
-        <PatientInfoPage />
+      <UserPrivateRoute path="/patient-info-intake-form">
+        <PatientInfoIntakeForm />
       </UserPrivateRoute>
-      
+      <UserPrivateRoute path="/injury-intake-form">
+        <InjuryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/symptom-checklist-intake-form">
+        <SymptomChecklistIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/additional-symptom-intake-form">
+        <AdditionalSymptomIntakeForm />
+      </UserPrivateRoute>
       {/* Catch all route */}
       <Route component={NotFound} />
     </Switch>

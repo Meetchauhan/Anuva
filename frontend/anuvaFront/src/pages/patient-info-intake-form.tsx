@@ -1,7 +1,7 @@
 import PatientInfo from "@/components/intakeForms/patientInfo";
 
-const PatientInfoPage = () => {
+const PatientInfoIntakeForm = () => {
   return <PatientInfo />;
 };
 
-export default PatientInfoPage;
+export default PatientInfoIntakeForm;
