@@ -23,11 +23,12 @@ import { toast } from "@/hooks/use-toast"
 import { navigate } from "wouter/use-browser-location"
 import useUserAuth from "@/hooks/useUserAuth"
 import { getUser } from "@/features/authSlice"
+import { injuryInfoForm } from "@/features/intakeFormSlice/injuryInfoSlice"
 
 
 // Zod schema for injury information validation
 const injuryInfoSchema = z.object({
-  patientID: z.number().min(1, "Patient ID is required"),
+  patientID: z.string().min(1, "Patient ID is required"),
   dateOfInjury: z.date({
     required_error: "Date of injury is required",
   }),
@@ -107,13 +108,25 @@ const InjuryInfo = () => {
     // const response = await dispatch(injuryInfoForm(formattedData)).unwrap()
     
     // For now, just show success message
+   const response = await dispatch(injuryInfoForm(formattedData)).unwrap()
+   console.log("response", response)
+   if(response?.status){
+    dispatch(getUser())
     toast({
       title: "Injury information submitted successfully",
       description: "Injury information has been submitted successfully",
     })
-    
     form.reset()
     navigate("/home")
+   }
+   else{
+    toast({
+      title: "Injury information submission failed",
+      description: "Please try again",
+      variant: "destructive",
+    })
+   }
+   
   }
 
   return (

@@ -16,12 +16,14 @@ export function PrivateRoute({ path, children, type }: PrivateRouteProps) {
   const getAuthToken = () => {
     if (typeof window !== "undefined") {
       if (type === "admin") {
-        return sessionStorage.getItem("adminAuthToken");
+        const token = sessionStorage.getItem("adminAuthToken");
+        return token === null ? undefined : token;
       } else {
-        return sessionStorage.getItem("authToken");
+        const token = sessionStorage.getItem("authToken");
+        return token === null ? undefined : token;
       }
     }
-    return null;
+    return undefined;
   };
 
   const getRedirectPath = () => (type === "admin" ? "/admin/auth" : "/auth");
@@ -30,8 +32,8 @@ export function PrivateRoute({ path, children, type }: PrivateRouteProps) {
     const checkAuth = () => {
       const currentToken = getAuthToken();
 
-      if (!currentToken) {
-        // No token, redirect to login
+      if (currentToken === undefined) {
+        // Token is undefined, redirect to login
         setLocation(getRedirectPath());
         return;
       }
@@ -49,7 +51,7 @@ export function PrivateRoute({ path, children, type }: PrivateRouteProps) {
   useEffect(() => {
     const handleStorageChange = () => {
       const newToken = getAuthToken();
-      if (!newToken) {
+      if (newToken === undefined) {
         setLocation(getRedirectPath());
       } else {
         setIsCheckingAuth(false);
@@ -71,7 +73,7 @@ export function PrivateRoute({ path, children, type }: PrivateRouteProps) {
   }
 
   // If not authorized after check
-  if (!getAuthToken()) {
+  if (getAuthToken() === undefined) {
     return <Route path={path} />;
   }
 
@@ -98,11 +100,11 @@ export function AuthRoute({ path, children }: { path: string; children: ReactNod
       const userToken = sessionStorage.getItem("authToken");
       const adminToken = sessionStorage.getItem("adminAuthToken");
 
-      if (userToken) {
+      if (userToken !== null) {
         // User is logged in, redirect to home
         setLocation("/home");
         return;
-      } else if (adminToken) {
+      } else if (adminToken !== null) {
         // Admin is logged in, redirect to admin dashboard
         setLocation("/admin/dashboard");
         return;

@@ -50,21 +50,21 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
       const result = await dispatch(authLogin(data)).unwrap();
   
       console.log('Login result:', result);
-      sessionStorage.setItem('authToken', result.token);
+      // sessionStorage.setItem('authToken', result.token);
            
       if (result?.token) {
-        navigate("/home");
-        dispatch(getUser());
+        // navigate("/verify-otp");
+        // dispatch(getUser());
         // sessionStorage.setItem('authToken', result.token);
-        console.log('Token set in sessionStorage:', result.token);
+        // console.log('Token set in sessionStorage:', result.token);
       } else {
         console.log('No token in response:', result);
       }
 
 
       toast({
-        title: "Welcome Back",
-        description: "Successfully signed in to your healthcare dashboard.",
+        title: "OTP Sent Successfully...",
+        description: "Please check your email for the OTP.",
       });
      
       // Call onLoginSuccess after token is set
@@ -147,7 +147,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
               Forgot your password?
             </button>
             
-            <div>
+            {/* <div>
               <button
                 type="button"
                 onClick={onSwitchToSignup}
@@ -155,8 +155,8 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
               >
                 Don't have an account? Sign up
               </button>
-            </div>
-          </div>
+            </div> */}
+          </div> 
         </form>
       </CardContent>
     </Card>

@@ -43,6 +43,8 @@ import PatientInfoIntakeForm from "./pages/patient-info-intake-form";
 import InjuryIntakeForm from "./pages/injury-intake-form";
 import SymptomChecklistIntakeForm from "./pages/symptomChecklist-intale-form";
 import AdditionalSymptomIntakeForm from "./pages/additionalSymptom-intake-form";
+import HeadacheIntakeForm from "./pages/headache-intake-form";
+import SleepDisturbanceIntakeForm from "./pages/sleep-disturbance-intake-form";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -53,9 +55,9 @@ function AutoRedirect() {
     const adminToken = sessionStorage.getItem("adminAuthToken");
     const userToken = sessionStorage.getItem("authToken");
     
-    if (adminToken) {
+    if (adminToken !== null) {
       setLocation("/admin/dashboard");
-    } else if (userToken) {
+    } else if (userToken !== null) {
       // Check if user has filled intake form before redirecting to home
       const user = (userAuth as any)?.user;
       // if (user && user?.isIntakeFormFilled === false) {
@@ -208,6 +210,12 @@ function UserRouter() {
       </UserPrivateRoute>
       <UserPrivateRoute path="/additional-symptom-intake-form">
         <AdditionalSymptomIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/headache-intake-form">
+        <HeadacheIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/sleep-disturbance-intake-form">
+        <SleepDisturbanceIntakeForm />
       </UserPrivateRoute>
       {/* Catch all route */}
       <Route component={NotFound} />

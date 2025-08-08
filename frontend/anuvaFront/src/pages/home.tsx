@@ -12,14 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MessageCircle, FileText, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { Appointment } from "@shared/schema";
+import { useDispatch } from "react-redux";
+// import { getUser } from "@/features/authSlice";
+import { AppDispatch } from "@/store/store";
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { data: upcomingAppointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments/upcoming"],
   });
+
+  // useEffect(() => {
+  //   dispatch(getUser());
+  // }, [dispatch]);
 
   // Redirect to home if not authenticated
   // useEffect(() => {
@@ -68,7 +76,7 @@ export default function Home() {
           <div className="space-y-6">
             <ProgressOverview />
             <AchievementBadges />
-            
+
             {/* Upcoming Appointments */}
             <Card>
               <CardHeader>
@@ -83,7 +91,10 @@ export default function Home() {
                 ) : (
                   <div className="space-y-4">
                     {upcomingAppointments.slice(0, 3).map((appointment) => (
-                      <div key={appointment.id} className="border-l-4 border-blue-600 pl-4 text-left bg-[transparent] text-[#020817]">
+                      <div
+                        key={appointment.id}
+                        className="border-l-4 border-blue-600 pl-4 text-left bg-[transparent] text-[#020817]"
+                      >
                         <h4 className="font-semibold text-gray-900">
                           {appointment.providerName}
                         </h4>
@@ -91,16 +102,24 @@ export default function Home() {
                           {appointment.appointmentType}
                         </p>
                         <p className="text-sm font-medium text-[#154734]">
-                          {new Date(appointment.scheduledAt).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })} • {new Date(appointment.scheduledAt).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit',
-                            hour12: true
-                          })}
+                          {new Date(appointment.scheduledAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            }
+                          )}{" "}
+                          •{" "}
+                          {new Date(appointment.scheduledAt).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            }
+                          )}
                         </p>
                       </div>
                     ))}

@@ -20,6 +20,7 @@ const initialState = {
   loading: false,
   error: null as string | null,
   data: null,
+  isOtpSent: false,
 };
 
 export const authSignup = createAsyncThunk("auth/signup", async (data: SignupFormData) => {
@@ -29,6 +30,16 @@ export const authSignup = createAsyncThunk("auth/signup", async (data: SignupFor
 
 export const authLogin = createAsyncThunk("auth/login", async (data: LoginFormData) => {
     const response = await axiosPublic.post(`/api/auth/login`, data);
+    return response.data;
+  });
+
+  export const resendOtp = createAsyncThunk("otp/resendOtp", async ({ patientId }: { patientId: string }) => {
+    const response = await axiosPublic.post(`/api/auth/resend-otp`, { patientId });
+    return response.data;
+  });
+
+ export const verifyOtp = createAsyncThunk("otp/verifyOtp", async ({ otp, patientId }: { otp: string; patientId: string }) => {
+    const response = await axiosPublic.post("/api/auth/verify-otp", { otp, patientId });
     return response.data;
   });
 
@@ -57,6 +68,7 @@ const authSlice = (name: string) => {
         state.loading = false;
         state.data = action.payload;
         state.error = null;
+        state.isOtpSent = true;
       });
       builder.addCase(authLogin.rejected, (state, action) => {  
         state.loading = false;
@@ -87,6 +99,32 @@ const authSlice = (name: string) => {
       builder.addCase(getUser.rejected, (state, action) => {  
         state.loading = false;
         state.error = action.error.message || "Get user failed";
+      });
+      builder.addCase(verifyOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      });
+      builder.addCase(verifyOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.isOtpSent = false;
+      });
+      builder.addCase(verifyOtp.rejected, (state, action) => {  
+        state.loading = false;
+        state.error = action.error.message || "Verify OTP failed";
+        
+      });
+      builder.addCase(resendOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      });
+      builder.addCase(resendOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      });
+      builder.addCase(resendOtp.rejected, (state, action) => {  
+        state.loading = false;
+        state.error = action.error.message || "Resend OTP failed";
       });
     },
   });

@@ -4,12 +4,12 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     loading: false,
-    error: null,
+    error: null as string | null,
     // injuryInfo: null,
 };
 
 export const injuryInfoForm = createAsyncThunk("injuryInfo/injuryInfoForm", async (data: any) => {
-  const response = await axiosPrivate.post(`/api/injury-info`, data);
+  const response = await axiosPrivate.post(`/api/forms/injury-form`, data);
   return response.data;
 });
 

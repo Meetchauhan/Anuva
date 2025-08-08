@@ -3,10 +3,15 @@ import { useLocation } from "wouter";
 import SignupForm from "@/components/auth/signup-form";
 import LoginForm from "@/components/auth/login-form";
 import { AuthContext } from "@/context/auth-context";
+import VerifyOtp from "@/components/verifyOtp/verifyOtp";
+import useUserAuth from "@/hooks/useUserAuth";
+import useOtp from "@/hooks/useOtp";
 
 export default function Auth() {
   const [, navigate] = useLocation();
   const [isSignup, setIsSignup] = useState(false);
+  const isOtpSent = useOtp()
+  console.log("isOtpSent",isOtpSent)
   const handleAuthSuccess = () => {
     console.log('Auth success callback called');
     console.log('Token in sessionStorage:', sessionStorage.getItem('authToken'));
@@ -28,7 +33,7 @@ export default function Auth() {
         </div>
 
         {/* Authentication Forms */}
-        {isSignup ? (
+        {/* {isSignup ? (
           <SignupForm 
             onSignupSuccess={handleAuthSuccess}
             onSwitchToLogin={switchToLogin}
@@ -38,7 +43,20 @@ export default function Auth() {
             onLoginSuccess={handleAuthSuccess}
             onSwitchToSignup={switchToSignup}
           />
+        )} */}
+        
+
+           {/* Authentication Forms */}
+        {(isOtpSent as any)? (
+          
+          <VerifyOtp />
+        ) : (
+          <LoginForm 
+            onLoginSuccess={handleAuthSuccess}
+            onSwitchToSignup={switchToSignup}
+          />
         )}
+       
       </div>
     </div>
   );
