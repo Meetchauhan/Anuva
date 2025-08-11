@@ -16,6 +16,8 @@ import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Separator } from "@/components/ui/separator"
 import { Loader2 } from "lucide-react"
+import { sleepDisturbanceInfoForm } from "@/features/intakeFormSlice/sleepDisturbanceInfo"
+import { navigate } from "wouter/use-browser-location"
 
 // Zod schema for sleep disturbance validation
 const sleepDisturbanceSchema = z.object({
@@ -53,6 +55,7 @@ const sleepDisturbanceSchema = z.object({
 type SleepDisturbanceFormData = z.infer<typeof sleepDisturbanceSchema>
 
 const SleepDisturbanceInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -84,32 +87,29 @@ const SleepDisturbanceInfo = () => {
   });
 
   const onSubmit = async (data: SleepDisturbanceFormData) => {
-    try {
-      setIsLoading(true);
-      
-      // TODO: Replace with actual API call
-      // await dispatch(sleepDisturbanceForm(data)).unwrap();
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    try{
+    setIsSubmitting(true);
+    const response = await dispatch(sleepDisturbanceInfoForm(data)).unwrap()
+    if(response.status) {
+      setIsSubmitting(false);
       toast({
         title: "Sleep Disturbance Information Saved",
-        description: "Your sleep disturbance information has been successfully recorded.",
+        description: response.message,
       });
-      
-      // Reset form after successful submission
-      form.reset();
-      
-    } catch (error) {
-      toast({
-        title: "Failed to Save",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+      form.reset()
+      navigate("/home")
     }
+  }catch(error){
+    console.log(error)
+    setIsSubmitting(false);
+    toast({
+      title: "Error in form submission",
+      description: "Please try again",
+      variant: "destructive",
+    });
+  }finally{
+    setIsSubmitting(false);
+  }
   };
 
   const severityLevels = [
@@ -134,6 +134,15 @@ const SleepDisturbanceInfo = () => {
 
   return (
     <div className="container mx-auto py-12 px-6 max-w-5xl">
+       {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">Submitting sleep disturbance information...</p>
+                    <p className="text-sm text-gray-500">Please wait while we save sleep disturbance information</p>
+                  </div>
+                </div>
+              )}
       <Card className="shadow-lg">
         <CardHeader className="pb-8">
           <CardTitle className="text-3xl font-bold text-center text-black mb-4">Sleep Disturbance Information</CardTitle>
@@ -144,7 +153,7 @@ const SleepDisturbanceInfo = () => {
         <CardContent className="px-8 pb-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              
+             
               {/* General Sleep Disturbance */}
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-black mb-6">General Sleep Assessment</h3>
@@ -723,8 +732,18 @@ const SleepDisturbanceInfo = () => {
                 <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Reset Form
                 </Button>
-                <Button type="submit">
-                  Submit Sleep Disturbance Information
+                <Button 
+                  type="submit" 
+                  disabled={!form.watch("hasSleepDisturbance") || isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Sleep Disturbance Information"
+                  )}
                 </Button>
               </div>
             </form>

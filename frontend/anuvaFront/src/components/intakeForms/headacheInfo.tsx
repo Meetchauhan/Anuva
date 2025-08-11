@@ -18,6 +18,8 @@ import { Slider } from "@/components/ui/slider"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle } from "lucide-react"
+import { headacheInfoForm } from "@/features/intakeFormSlice/headacheInfoSlice"
+import { navigate } from "wouter/use-browser-location"
 
 // Zod schema for headache info validation
 const headacheInfoSchema = z.object({
@@ -50,6 +52,7 @@ const headacheInfoSchema = z.object({
 type HeadacheInfoFormData = z.infer<typeof headacheInfoSchema>
 
 const HeadacheInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -75,32 +78,30 @@ const HeadacheInfo = () => {
   });
 
   const onSubmit = async (data: HeadacheInfoFormData) => {
-    try {
-      setIsLoading(true);
-      
+   
+      setIsSubmitting(true);
       // TODO: Replace with actual API call
       // await dispatch(headacheInfoForm(data)).unwrap();
-      
+      const response = await dispatch(headacheInfoForm(data)).unwrap()
+      if(response.status) {
+        setIsSubmitting(false);
+        toast({
+          title: "Headache Information Saved",
+          description: response.message,
+        });
+        form.reset()
+        navigate("/home")
+      }else{
+        setIsSubmitting(false);
+        toast({
+          title: "Headache Information Saved",
+          description: response.message,
+        });
+      }
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    
       
-      toast({
-        title: "Headache Information Saved",
-        description: "Your headache information has been successfully recorded.",
-      });
-      
-      // Reset form after successful submission
-      form.reset();
-      
-    } catch (error) {
-      toast({
-        title: "Failed to Save",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  
   };
 
   const painLevels = [
@@ -119,6 +120,15 @@ const HeadacheInfo = () => {
 
   return (
     <div className="container mx-auto py-12 px-6 max-w-5xl">
+       {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">Submitting headache information...</p>
+                    <p className="text-sm text-gray-500">Please wait while we save headache information</p>
+                  </div>
+                </div>
+              )} 
       <Card className="shadow-lg">
         <CardHeader className="pb-8">
           <CardTitle className="text-3xl font-bold text-center text-black mb-4">Headache Information</CardTitle>
@@ -129,7 +139,7 @@ const HeadacheInfo = () => {
         <CardContent className="px-8 pb-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              
+           
               {/* Basic Information */}
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-black mb-6">Basic Information</h3>

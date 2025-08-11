@@ -45,6 +45,7 @@ import SymptomChecklistIntakeForm from "./pages/symptomChecklist-intale-form";
 import AdditionalSymptomIntakeForm from "./pages/additionalSymptom-intake-form";
 import HeadacheIntakeForm from "./pages/headache-intake-form";
 import SleepDisturbanceIntakeForm from "./pages/sleep-disturbance-intake-form";
+import BodyPainIntakeForm from "./pages/body-pain-intake-form";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -216,6 +217,9 @@ function UserRouter() {
       </UserPrivateRoute>
       <UserPrivateRoute path="/sleep-disturbance-intake-form">
         <SleepDisturbanceIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/body-pain-intake-form">
+        <BodyPainIntakeForm />
       </UserPrivateRoute>
       {/* Catch all route */}
       <Route component={NotFound} />

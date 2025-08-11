@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -18,11 +18,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
+import { symptomChecklistInfoForm } from "@/features/intakeFormSlice/symptomCheckistInfoSlice"
 
 // Zod schema for symptom checklist validation
 const symptomChecklistSchema = z.object({
-  patientID: z.number().min(1, "Patient ID is required"),
-  injuryID: z.number().min(1, "Injury ID is required"),
+  patientID: z.string().min(1, "Patient ID is required"),
+  injuryID: z.string().min(1, "Injury ID is required"),
   headache: z.number().min(0).max(6),
   pressureInHead: z.number().min(0).max(6),
   neckPain: z.number().min(0).max(6),
@@ -52,18 +53,17 @@ const symptomChecklistSchema = z.object({
 type SymptomChecklistFormData = z.infer<typeof symptomChecklistSchema>
 
 const SymptomChecklistInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userAuth = useUserAuth();
   
-  useEffect(() => { 
-    dispatch(getUser())
-  }, [dispatch]);
+ 
 
   const form = useForm<SymptomChecklistFormData>({
     resolver: zodResolver(symptomChecklistSchema),
     defaultValues: {
       patientID: (userAuth as any)?.user?.patientId || 0,
-      injuryID: 0, // This should be passed as prop or from context
+      injuryID: (userAuth as any)?.user?.injuryId || 0, // This should be passed as prop or from context
       headache: 0,
       pressureInHead: 0,
       neckPain: 0,
@@ -93,36 +93,48 @@ const SymptomChecklistInfo = () => {
 
   const onSubmit = async (data: SymptomChecklistFormData) => {
     // Calculate total symptoms and severity score
-    const symptomScores = [
-      data.headache, data.pressureInHead, data.neckPain, data.troubleFallingAsleep, data.drowsiness,
-      data.nauseaOrVomiting, data.fatigueOrLowEnergy, data.dizziness, data.blurredVision, data.balanceProblems,
-      data.sensitivityToLight, data.sensitivityToNoise, data.feelingSlowedDown, data.feelingInAFog, data.dontFeelRight,
-      data.difficultyConcentrating, data.difficultyRemembering, data.confusion, data.moreEmotional, data.irritability,
-      data.sadnessOrDepression, data.nervousOrAnxious
-    ]
-    
-    const totalSymptoms = symptomScores.filter(score => score > 0).length
-    const symptomSeverityScore = symptomScores.reduce((total, score) => total + score, 0)
+    // const symptomScores = [
+    //   data.headache, data.pressureInHead, data.neckPain, data.troubleFallingAsleep, data.drowsiness,
+    //   data.nauseaOrVomiting, data.fatigueOrLowEnergy, data.dizziness, data.blurredVision, data.balanceProblems,
+    //   data.sensitivityToLight, data.sensitivityToNoise, data.feelingSlowedDown, data.feelingInAFog, data.dontFeelRight,
+    //   data.difficultyConcentrating, data.difficultyRemembering, data.confusion, data.moreEmotional, data.irritability,
+    //   data.sadnessOrDepression, data.nervousOrAnxious
+    // ]
 
-    const formattedData = {
-      ...data,
-      totalSymptoms,
-      symptomSeverityScore,
-    }
+    setIsSubmitting(true);
+    const response = await dispatch(symptomChecklistInfoForm(data)).unwrap()
+    console.log("Symptom Checklist Form Response:", response)
     
-    console.log("Symptom Checklist Form Data:", formattedData)
+    // const totalSymptoms = symptomScores.filter(score => score > 0).length
+    // const symptomSeverityScore = symptomScores.reduce((total, score) => total + score, 0)
+
+    // const formattedData = {
+    //   ...data,
+    //   totalSymptoms,
+    //   symptomSeverityScore,
+    // }
+    
+    // console.log("Symptom Checklist Form Data:", formattedData)
     
     // TODO: Replace with actual API call when symptom checklist slice is created
     // const response = await dispatch(symptomChecklistForm(formattedData)).unwrap()
     
     // For now, just show success message
+    if(response.status) {
+      setIsSubmitting(false);
     toast({
       title: "Symptom checklist submitted successfully",
-      description: "Your symptom checklist has been submitted successfully",
+      description: response.message,
     })
-    
-    form.reset()
     navigate("/home")
+    form.reset()
+  }else{
+    setIsSubmitting(false);
+    toast({
+      title: "Symptom checklist submission failed",
+      description: response.message,
+    })
+  }
   }
 
   const renderSymptomSlider = (name: keyof SymptomChecklistFormData, label: string, description?: string) => (
@@ -139,7 +151,7 @@ const SymptomChecklistInfo = () => {
           </div>
           <FormControl>
             <Slider
-              value={[field.value]}
+              value={[Number(field.value) || 0]}
               onValueChange={(value) => field.onChange(value[0])}
               max={6}
               min={0}
@@ -160,6 +172,15 @@ const SymptomChecklistInfo = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+       {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">Submitting symptom checklist information...</p>
+                    <p className="text-sm text-gray-500">Please wait while we save symptom checklist information</p>
+                  </div>
+                </div>
+              )}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Symptom Checklist</CardTitle>
@@ -171,6 +192,7 @@ const SymptomChecklistInfo = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Patient Information */}
+             
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold border-b pb-2">Patient Information</h3>
                 
@@ -210,7 +232,10 @@ const SymptomChecklistInfo = () => {
                             type="number" 
                             placeholder="Enter injury ID" 
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            value={(userAuth as any)?.user?.injuryId || ''}
+                            disabled={true}
+                            // onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            className="bg-gray-100 cursor-not-allowed"
                           />
                         </FormControl>
                         <FormMessage />

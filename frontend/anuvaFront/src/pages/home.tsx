@@ -12,14 +12,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MessageCircle, FileText, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { Appointment } from "@shared/schema";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 // import { getUser } from "@/features/authSlice";
-import { AppDispatch } from "@/store/store";
+import { AppDispatch, RootState } from "@/store/store";
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
   const { toast } = useToast();
   const dispatch = useDispatch<AppDispatch>();
+
+  const loadingFormStatus = useSelector((state: RootState) => state.auth?.loading);
 
   const { data: upcomingAppointments = [] } = useQuery<Appointment[]>({
     queryKey: ["/api/appointments/upcoming"],

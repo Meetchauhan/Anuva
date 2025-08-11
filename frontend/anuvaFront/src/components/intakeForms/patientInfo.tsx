@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -48,6 +48,7 @@ const patientInfoSchema = z.object({
 type PatientInfoFormData = z.infer<typeof patientInfoSchema>
 
 const PatientInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const form = useForm<PatientInfoFormData>({
     resolver: zodResolver(patientInfoSchema),
@@ -70,14 +71,15 @@ const PatientInfo = () => {
 
   const onSubmit = async (data: PatientInfoFormData) => {
     // Format the date to YYYY-MM-DD format
+    setIsSubmitting(true);
     const formattedData = {
       ...data,
       dateOfExamination: format(data.dateOfExamination, 'yyyy-MM-dd')
     }
-    console.log("Patient Info Form Data:", formattedData)
     const response = await dispatch(patientInfoForm(formattedData)).unwrap()
-    console.log("Response:", response)
+
     if(response.status) {
+      setIsSubmitting(false);
       form.reset()
       navigate("/home")
       toast({
@@ -85,6 +87,7 @@ const PatientInfo = () => {
         description: "Patient information has been submitted successfully",
       })
     } else {
+      setIsSubmitting(false);
       toast({
         title: "Failed to submit patient information",
         description: "Failed to submit patient information",
@@ -94,6 +97,15 @@ const PatientInfo = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+       {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">Submitting patient information...</p>
+                    <p className="text-sm text-gray-500">Please wait while we save patient information</p>
+                  </div>
+                </div>
+              )}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Patient Information Form</CardTitle>
@@ -105,6 +117,7 @@ const PatientInfo = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Personal Information Section */}
+             
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold border-b pb-2">Personal Information</h3>
                 

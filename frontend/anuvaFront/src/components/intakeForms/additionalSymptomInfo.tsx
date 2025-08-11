@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -9,7 +9,7 @@ import { AppDispatch } from "@/store/store"
 import { toast } from "@/hooks/use-toast"
 import { navigate } from "wouter/use-browser-location"
 import useUserAuth from "@/hooks/useUserAuth"
-import { getUser } from "@/features/authSlice"
+// import { getUser } from "@/features/authSlice"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,11 +18,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Slider } from "@/components/ui/slider"
+import { additionalSymptomChecklistInfoForm } from "@/features/intakeFormSlice/additionalSymptomChecklistInfoSlice"
 
 // Zod schema for additional symptoms validation
 const additionalSymptomSchema = z.object({
-  patientID: z.number().min(1, "Patient ID is required"),
-  injuryID: z.number().min(1, "Injury ID is required"),
+  patientID: z.string().min(1, "Patient ID is required"),
+  injuryID: z.string().min(1, "Injury ID is required"),
   painLocation: z.string().max(100, "Pain location must be less than 100 characters").optional(),
   painInOtherParts: z.number().min(0).max(6),
   problemsWithSleeping: z.number().min(0).max(6),
@@ -55,18 +56,17 @@ const additionalSymptomSchema = z.object({
 type AdditionalSymptomFormData = z.infer<typeof additionalSymptomSchema>
 
 const AdditionalSymptomInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const userAuth = useUserAuth();
   
-  useEffect(() => { 
-    dispatch(getUser())
-  }, [dispatch]);
+
 
   const form = useForm<AdditionalSymptomFormData>({
     resolver: zodResolver(additionalSymptomSchema),
     defaultValues: {
       patientID: (userAuth as any)?.user?.patientId || 0,
-      injuryID: 0, // This should be passed as prop or from context
+      injuryID: (userAuth as any)?.user?.injuryId || 0, // This should be passed as prop or from context
       painLocation: "",
       painInOtherParts: 0,
       problemsWithSleeping: 0,
@@ -99,39 +99,43 @@ const AdditionalSymptomInfo = () => {
 
   const onSubmit = async (data: AdditionalSymptomFormData) => {
     // Calculate total symptoms and severity score
-    const symptomScores: number[] = [
-      data.painInOtherParts, data.problemsWithSleeping, data.gaitOrBalanceProblems,
-      data.visionLossOrChange, data.hearingLossOrChange, data.lossOfSmellOrTaste,
-      data.speechChanges, data.weakness, data.tremors, data.bowelOrBladderDisturbances,
-      data.sexualDysfunction, data.difficultyPlanningAndOrganizing, data.difficultyAnticipatingConsequences,
-      data.wordFindingDifficulties, data.difficultyUnderstandingConversations, data.lostInFamiliarEnvironment,
-      data.lossOfAppetite, data.suicidalOrHomicidalThoughts, data.verballyOrPhysicallyAggressive,
-      data.personalityChanges, data.disInhibition, data.avoidanceBehaviors,
-      data.intrusiveDistressingThoughts, data.repetitiveMotorActivity
-    ]
+    // const symptomScores: number[] = [
+    //   data.painInOtherParts, data.problemsWithSleeping, data.gaitOrBalanceProblems,
+    //   data.visionLossOrChange, data.hearingLossOrChange, data.lossOfSmellOrTaste,
+    //   data.speechChanges, data.weakness, data.tremors, data.bowelOrBladderDisturbances,
+    //   data.sexualDysfunction, data.difficultyPlanningAndOrganizing, data.difficultyAnticipatingConsequences,
+    //   data.wordFindingDifficulties, data.difficultyUnderstandingConversations, data.lostInFamiliarEnvironment,
+    //   data.lossOfAppetite, data.suicidalOrHomicidalThoughts, data.verballyOrPhysicallyAggressive,
+    //   data.personalityChanges, data.disInhibition, data.avoidanceBehaviors,
+    //   data.intrusiveDistressingThoughts, data.repetitiveMotorActivity
+    // ]
     
-    const totalSymptoms = symptomScores.filter(score => score > 0).length
-    const symptomSeverityScore = symptomScores.reduce((total, score) => total + score, 0)
+    // const totalSymptoms = symptomScores.filter(score => score > 0).length
+    // const symptomSeverityScore = symptomScores.reduce((total, score) => total + score, 0)
 
-    const formattedData = {
-      ...data,
-      totalSymptoms,
-      symptomSeverityScore,
+    // const formattedData = {
+    //   ...data,
+    //   totalSymptoms,
+    //   symptomSeverityScore,
+    // }
+    setIsSubmitting(true);
+    const response = await dispatch(additionalSymptomChecklistInfoForm(data)).unwrap()
+    if(response.status) {
+      setIsSubmitting(false);
+      toast({
+        title: "Additional symptoms submitted successfully",
+        description: response.message,
+      })
+      navigate("/home")
+      form.reset()
+    }else{
+      setIsSubmitting(false);
+      toast({
+        title: "Additional symptoms submission failed",
+        description: response.message,
+      })
     }
     
-    console.log("Additional Symptoms Form Data:", formattedData)
-    
-    // TODO: Replace with actual API call when additional symptoms slice is created
-    // const response = await dispatch(additionalSymptomForm(formattedData)).unwrap()
-    
-    // For now, just show success message
-    toast({
-      title: "Additional symptoms submitted successfully",
-      description: "Your additional symptoms have been submitted successfully",
-    })
-    
-    form.reset()
-    navigate("/home")
   }
 
   const renderSymptomSlider = (name: keyof AdditionalSymptomFormData, label: string, description?: string) => (
@@ -148,7 +152,7 @@ const AdditionalSymptomInfo = () => {
           </div>
           <FormControl>
             <Slider
-              value={[field.value]}
+              value={[Number(field.value) || 0]}
               onValueChange={(value) => field.onChange(value[0])}
               max={6}
               min={0}
@@ -169,6 +173,15 @@ const AdditionalSymptomInfo = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      {isSubmitting && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">Submitting additional symptoms information...</p>
+                    <p className="text-sm text-gray-500">Please wait while we save additional symptoms information</p>
+                  </div>
+                </div>
+              )}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Additional Symptoms Assessment</CardTitle>
@@ -180,29 +193,28 @@ const AdditionalSymptomInfo = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Patient Information */}
+              
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold border-b pb-2">Patient Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
+                <FormField
                     control={form.control}
-                    name="patientID"
+                    name="injuryID"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Patient ID *</FormLabel>
+                        <FormLabel>Injury ID *</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
-                            placeholder="Patient ID" 
+                            placeholder="Enter injury ID" 
                             {...field}
-                            value={(userAuth as any)?.user?.patientId || ''}
+                            value={(userAuth as any)?.user?.injuryId || ''}
                             disabled={true}
+                            // onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             className="bg-gray-100 cursor-not-allowed"
                           />
                         </FormControl>
-                        <FormDescription>
-                          This field is automatically populated from your account
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -219,7 +231,10 @@ const AdditionalSymptomInfo = () => {
                             type="number" 
                             placeholder="Enter injury ID" 
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            value={(userAuth as any)?.user?.injuryId || ''}
+                            disabled={true}
+                            className="bg-gray-100 cursor-not-allowed"
+                            // onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           />
                         </FormControl>
                         <FormMessage />

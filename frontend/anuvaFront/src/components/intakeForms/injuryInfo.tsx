@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -31,6 +31,12 @@ const injuryInfoSchema = z.object({
   patientID: z.string().min(1, "Patient ID is required"),
   dateOfInjury: z.date({
     required_error: "Date of injury is required",
+  }).refine((date) => {
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // Set to end of today to allow today's date
+    return date <= today;
+  }, {
+    message: "Date of injury cannot be in the future"
   }),
   sportOrActivity: z.string().min(1, "Sport or activity is required").max(100, "Sport or activity must be less than 100 characters"),
   setting: z.enum(["game", "practice", "other"], {
@@ -60,11 +66,12 @@ const injuryInfoSchema = z.object({
 type InjuryInfoFormData = z.infer<typeof injuryInfoSchema>
 
 const InjuryInfo = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
       const dispatch = useDispatch<AppDispatch>();
   const userAuth = useUserAuth();
-  useEffect(() => { 
-    dispatch(getUser())
-   }, [dispatch]);
+  // useEffect(() => { 
+  //   dispatch(getUser())
+  //  }, [dispatch]);
    
    
   const form = useForm<InjuryInfoFormData>({
@@ -98,20 +105,20 @@ const InjuryInfo = () => {
 
   const onSubmit = async (data: InjuryInfoFormData) => {
     // Format the date to YYYY-MM-DD format
+    setIsSubmitting(true);
     const formattedData = {
       ...data,
       dateOfInjury: format(data.dateOfInjury, 'yyyy-MM-dd')
     }
-    console.log("Injury Info Form Data:", formattedData)
     
     // TODO: Replace with actual API call when injury slice is created
     // const response = await dispatch(injuryInfoForm(formattedData)).unwrap()
     
     // For now, just show success message
    const response = await dispatch(injuryInfoForm(formattedData)).unwrap()
-   console.log("response", response)
    if(response?.status){
-    dispatch(getUser())
+    setIsSubmitting(false);
+    // dispatch(getUser())
     toast({
       title: "Injury information submitted successfully",
       description: "Injury information has been submitted successfully",
@@ -120,6 +127,7 @@ const InjuryInfo = () => {
     navigate("/home")
    }
    else{
+    setIsSubmitting(false);
     toast({
       title: "Injury information submission failed",
       description: "Please try again",
@@ -131,6 +139,15 @@ const InjuryInfo = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      {isSubmitting && (
+        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-lg font-medium text-gray-700">Submitting injury information...</p>
+            <p className="text-sm text-gray-500">Please wait while we save injury information</p>
+          </div>
+        </div>
+      )}
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Injury Information Form</CardTitle>
@@ -200,6 +217,7 @@ const InjuryInfo = () => {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
+                              disabled={(date) => date > new Date()}
                               initialFocus
                             />
                           </PopoverContent>
