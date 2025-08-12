@@ -1,4 +1,4 @@
-import HeadacheInfo from "../components/intakeForms/headacheInfo";
+import HeadacheInfo from "@/components/intakeForms/headacheInfo";
 
 const HeadacheIntakeForm = () => {
   return (

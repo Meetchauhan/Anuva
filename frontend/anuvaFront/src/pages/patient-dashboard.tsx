@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/auth-context";
+import useUserAuth  from "@/hooks/useUserAuth";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from "recharts";
 import { formatDate, formatDateShort, getSymptomSeverityColor } from "@/lib/utils";
@@ -12,7 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
 export default function PatientDashboard() {
-  const { user } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch patient data
@@ -91,7 +93,7 @@ export default function PatientDashboard() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome, {user?.fullName}
+            Welcome, {user?.user?.fullName || "User"}
           </h1>
           <p className="text-muted-foreground">
             Track your symptoms, recovery progress, and upcoming appointments.

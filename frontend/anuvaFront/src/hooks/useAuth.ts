@@ -2,18 +2,20 @@ import { AuthContext } from "@/context/auth-context";
 import { useQuery } from "@tanstack/react-query";
 import { useContext } from "react";
 
-export function useAuth() {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["http://localhost:5000/api/auth/user"],
-    retry: false,
-  });
+import { useContext } from "react";
 
-  return {
-    user:user?.user,
-    isLoading,
-    isAuthenticated: !!user,
-  };
-}
+// export function useAuth() {
+//   const { data: user, isLoading } = useQuery({
+//     queryKey: ["http://localhost:5000/api/auth/user"],
+//     retry: false,
+//   });
+
+//   return {
+//     user:user?.user,
+//     isLoading,
+//     isAuthenticated: !!user,
+//   };
+// }
 
 
 

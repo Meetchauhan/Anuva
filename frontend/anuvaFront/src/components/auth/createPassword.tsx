@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { AuthContext } from "@/context/auth-context";
 import { useLocation } from "wouter";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";

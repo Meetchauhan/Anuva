@@ -41,7 +41,7 @@ interface RegisterFormData {
 
 // Interface for login form data
 interface LoginFormData {
-  username: string;
+  userName: string;
   password: string;
 }
 

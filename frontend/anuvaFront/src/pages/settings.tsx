@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUserAuth from "@/hooks/useUserAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
@@ -17,7 +17,9 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import type { EmergencyContact } from "@shared/schema";
 
 export default function Settings() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -26,66 +28,66 @@ export default function Settings() {
   });
 
   // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
+  // useEffect(() => {
+  //   if (sessionStorage.getItem('authToken')) {
+  //     toast({
+  //       title: "---Unauthorized TEST",
+  //       description: "TEST--- You are logged out. Logging in again...",
+  //       variant: "destructive",
+  //     });
+  //     setTimeout(() => {
+  //       window.location.href = "/home";
+  //     }, 500);
+  //     return;
+  //   }
+  // }, [sessionStorage.getItem('authToken'), toast]);
 
-  const deleteContactMutation = useMutation({
-    mutationFn: async (contactId: number) => {
-      await apiRequest("DELETE", `/api/emergency-contacts/${contactId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/emergency-contacts"] });
-      toast({
-        title: "Contact Deleted",
-        description: "Emergency contact has been removed.",
-      });
-    },
-    onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to delete contact. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+  // const deleteContactMutation = useMutation({
+  //   mutationFn: async (contactId: number) => {
+  //     await apiRequest("DELETE", `/api/emergency-contacts/${contactId}`);
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["/api/emergency-contacts"] });
+  //     toast({
+  //       title: "Contact Deleted",
+  //       description: "Emergency contact has been removed.",
+  //     });
+  //   },
+  //   onError: (error) => {
+  //     if (isUnauthorizedError(error)) {
+  //       toast({
+  //         title: "---Unauthorized",
+  //         description: "---You are logged out. Logging in again...",
+  //         variant: "destructive",
+  //       });
+  //       setTimeout(() => {
+  //         window.location.href = "/home";
+  //       }, 500);
+  //       return;
+  //     }
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to delete contact. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //   },
+  // });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="animate-pulse">
-          <div className="h-16 bg-white border-b"></div>
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
-          <div className="h-16 bg-white border-b"></div>
-        </div>
-      </div>
-    );
-  }
+  // if (sessionStorage.getItem('authToken')) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50">
+  //       <div className="animate-pulse">
+  //         <div className="h-16 bg-white border-b"></div>
+  //         <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
+  //         <div className="h-16 bg-white border-b"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated) {
-    return null; // Will redirect via useEffect
-  }
+  // if (!sessionStorage.getItem('authToken')) {
+  //   return null; // Will redirect via useEffect
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50">

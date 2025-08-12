@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
 import { UserRole } from "@/types";
 import { useDispatch } from "react-redux";
 import { signupAdmin } from "@/features/adminAuthSlice";
@@ -44,7 +43,6 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
-  const { registerMutation } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -64,7 +62,7 @@ export function RegisterForm() {
     },
   });
 
-  const selectedRole = form.watch("role");
+  // const selectedRole = form.watch("role");
 
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
@@ -72,7 +70,17 @@ export function RegisterForm() {
     
 
     try {
-      const response = await dispatch(signupAdmin(data)).unwrap();
+      const response = await dispatch(signupAdmin({ 
+        username: data.userName, 
+        password: data.password, 
+        fullName: data.fullName, 
+        email: data.email, 
+        phoneNumber: data.phoneNumber, 
+        speciality: data.speciality, 
+        licenseNumber: data.licenseNumber,
+        role: "provider"
+      })).unwrap();
+      
       if(response.status){
         sessionStorage.setItem("adminAuthToken", response.token);
         toast({
@@ -83,12 +91,30 @@ export function RegisterForm() {
       }else{
         toast({
           title: "Registration failed",
-          description: response.message,
+          description: response.message || "Registration failed",
+          variant: "destructive",
         });
       }
       console.log("response", response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      
+      // Handle different types of errors
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (err?.data?.message) {
+        errorMessage = err.data.message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      toast({
+        title: "Registration failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,9 +12,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
 import { getAdminProfile, loginAdmin } from "@/features/adminAuthSlice";
 import { toast } from "@/hooks/use-toast";
 import { navigate } from "wouter/use-browser-location";
@@ -29,11 +27,12 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const { loginMutation } = useAuth();
+      // const { loginMutation } = useAuth();
   const dispatch = useDispatch<AppDispatch>();
+  const loginMutation = useSelector((state: RootState) => state.adminAuth.loading);
   
   // Use the isPending state from the loginMutation
-  const isLoading = loginMutation.isPending;
+  const isLoading = loginMutation;
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -45,8 +44,8 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormValues) => {
     // Use the loginMutation provided by the auth context
-    const response = await dispatch(loginAdmin(data)).unwrap();
-    console.log("response", response);
+    const response = await dispatch(loginAdmin({ userName: data.userName, password: data.password })).unwrap();
+    console.log("response admin login form", response);
     // if(response.status === "success"){
       sessionStorage.setItem("adminAuthToken", response.token);
       toast({

@@ -1,4 +1,3 @@
-import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,12 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, Mail, Lock } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { AuthContext } from "@/context/auth-context";
 import { useLocation } from "wouter";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { authLogin, getUser } from "@/features/authSlice";
+import { useState } from "react";
 
 const loginSchema = z.object({
   patientId: z.string().min(1, "Please enter a valid email address"),
@@ -45,9 +43,9 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }: LoginFor
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      console.log('Attempting login with:', { email: data.patientId, password: '***' });
+      console.log('Attempting login with:', { patientId: data.patientId, password: '***' });
       
-      const result = await dispatch(authLogin(data)).unwrap();
+      const result = await dispatch(authLogin({ patientId: data.patientId, password: data.password })).unwrap();
   
       console.log('Login result:', result);
       // sessionStorage.setItem('authToken', result.token);

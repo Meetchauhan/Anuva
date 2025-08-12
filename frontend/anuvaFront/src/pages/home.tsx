@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUserAuth from "@/hooks/useUserAuth";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/header";
 import WelcomeBanner from "@/components/layout/welcome-banner";
@@ -17,7 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 
 export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const { toast } = useToast();
   const dispatch = useDispatch<AppDispatch>();
 

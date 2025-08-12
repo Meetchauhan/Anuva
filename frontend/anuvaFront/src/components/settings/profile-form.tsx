@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUserAuth from "@/hooks/useUserAuth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,19 +25,21 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfileForm() {
-  const { user } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
-      phone: user?.phone || "",
-      dateOfBirth: user?.dateOfBirth || "",
-      address: user?.address || "",
+      firstName: user?.user?.firstName || "",
+      lastName: user?.user?.lastName || "",
+      email: user?.user?.email || "",
+      phone: user?.user?.phone || "",
+      dateOfBirth: user?.user?.dateOfBirth || "",
+      address: user?.user?.address || "",
     },
   });
 

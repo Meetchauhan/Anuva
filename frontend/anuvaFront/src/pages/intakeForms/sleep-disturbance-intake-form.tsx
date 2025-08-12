@@ -1,4 +1,4 @@
-import SleepDisturbanceInfo from "../components/intakeForms/sleepDisturbanceInfo";
+import SleepDisturbanceInfo from "../../components/intakeForms/sleepDisturbanceInfo";
 
 const SleepDisturbanceIntakeForm = () => {
   return <SleepDisturbanceInfo />;

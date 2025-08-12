@@ -172,15 +172,7 @@ const SymptomChecklistInfo = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-       {isSubmitting && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-lg font-medium text-gray-700">Submitting symptom checklist information...</p>
-                    <p className="text-sm text-gray-500">Please wait while we save symptom checklist information</p>
-                  </div>
-                </div>
-              )}
+      
       <Card className="max-w-4xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">Symptom Checklist</CardTitle>

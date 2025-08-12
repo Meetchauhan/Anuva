@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // Import LoginFormData from adminAuthSlice
 interface LoginFormData {
-  email: string;
+  patientId: string;
   password: string;
 }
 

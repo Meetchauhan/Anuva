@@ -2,28 +2,30 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { LoginForm } from "@/components/auth/admin-login-form";
 import { RegisterForm } from "@/components/auth/register-form";
-import { useAuth } from "@/context/auth-context";
+import useUserAuth from "@/hooks/useUserAuth";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { UserRole } from "@/types";
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const { user } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const [, setLocation] = useLocation();
 
   // Redirect to appropriate dashboard if already logged in
-  useEffect(() => {
-    if (user) {
-      // Redirect based on user role
-      const dashboardRoutes = {
-        [UserRole.PROVIDER]: "/provider",
-        [UserRole.PATIENT]: "/patient",
-        [UserRole.CAREGIVER]: "/caregiver",
-      };
+  // useEffect(() => {
+  //   if (user) {
+  //     // Redirect based on user role
+  //     const dashboardRoutes = {
+  //       [UserRole.PROVIDER]: "/provider",
+  //       [UserRole.PATIENT]: "/patient",
+  //       [UserRole.CAREGIVER]: "/caregiver",
+  //     };
       
-      setLocation(dashboardRoutes[user.role] || "/");
-    }
-  }, [user, setLocation]);
+  //     setLocation(dashboardRoutes[user.role] || "/");
+  //   }
+  // }, [user, setLocation]);
 
   if (user) {
     // Show loading while redirecting

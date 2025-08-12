@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUserAuth from "@/hooks/useUserAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/layout/header";
@@ -12,7 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import type { LabResult } from "@shared/schema";
 
 export default function Analytics() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const user = useUserAuth();
+  console.log("user--------", user);
+  
   const { toast } = useToast();
 
   const { data: labResults = [] } = useQuery<LabResult[]>({
@@ -20,35 +22,35 @@ export default function Analytics() {
   });
 
   // Redirect to home if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
+  // useEffect(() => {
+  //   if (!user?.isToken) {
+  //     toast({
+  //       title: "Unauthorized",
+  //       description: "You are logged out. Logging in again...",
+  //       variant: "destructive",
+  //     });
+  //     setTimeout(() => {
+  //       window.location.href = "/api/login";
+  //     }, 500);
+  //     return;
+  //   }
+  // }, [user?.isToken, toast]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="animate-pulse">
-          <div className="h-16 bg-white border-b"></div>
-          <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
-          <div className="h-16 bg-white border-b"></div>
-        </div>
-      </div>
-    );
-  }
+  // if (user) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50">
+  //       <div className="animate-pulse">
+  //         <div className="h-16 bg-white border-b"></div>
+  //         <div className="h-32 bg-gradient-to-r from-blue-600 to-blue-700"></div>
+  //         <div className="h-16 bg-white border-b"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (!isAuthenticated) {
-    return null; // Will redirect via useEffect
-  }
+  // if (!isAuthenticated) {
+  //   return null; // Will redirect via useEffect
+  // }
 
   const getStatusBadgeColor = (status: string) => {
     switch (status.toLowerCase()) {

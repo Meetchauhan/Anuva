@@ -1,8 +1,8 @@
-import { useContext, useState } from "react";
+import {  useState } from "react";
 import { useLocation } from "wouter";
 import SignupForm from "@/components/auth/signup-form";
 import LoginForm from "@/components/auth/login-form";
-import { AuthContext } from "@/context/auth-context";
+import { useAuth } from "@/hooks/useAuth";
 import VerifyOtp from "@/components/verifyOtp/verifyOtp";
 import useUserAuth from "@/hooks/useUserAuth";
 import useOtp from "@/hooks/useOtp";

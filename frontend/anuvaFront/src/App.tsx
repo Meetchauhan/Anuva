@@ -7,12 +7,11 @@ import { useEffect, useState } from "react";
 
 // Admin context/providers
 import { SettingsProvider } from "./context/settings-context";
-import { AuthProvider } from "./context/auth-context";
+// import { AuthProvider } from "@/hooks/useAuth";
 import { AdminPrivateRoute, UserPrivateRoute, AuthRoute } from "./components/privateRoute/privateRoute";
 import { UserRole } from "./types/user-roles";
 
 // User auth hook
-import { useAuth } from "@/hooks/useAuth";
 import useUserAuth from "@/hooks/useUserAuth";
 
 // Layouts
@@ -39,13 +38,18 @@ import UserSettings from "@/pages/settings"; // To avoid conflict with admin Set
 import { Provider } from "react-redux";
 import  store  from "./store/store";
 import CreatePasswordPage from "./pages/createPasswordPage";
-import PatientInfoIntakeForm from "./pages/patient-info-intake-form";
-import InjuryIntakeForm from "./pages/injury-intake-form";
-import SymptomChecklistIntakeForm from "./pages/symptomChecklist-intale-form";
-import AdditionalSymptomIntakeForm from "./pages/additionalSymptom-intake-form";
-import HeadacheIntakeForm from "./pages/headache-intake-form";
-import SleepDisturbanceIntakeForm from "./pages/sleep-disturbance-intake-form";
-import BodyPainIntakeForm from "./pages/body-pain-intake-form";
+import PatientInfoIntakeForm from "./pages/intakeForms/patient-info-intake-form";
+import InjuryIntakeForm from "./pages/intakeForms/injury-intake-form";
+import SymptomChecklistIntakeForm from "./pages/intakeForms/symptomChecklist-intale-form";
+import AdditionalSymptomIntakeForm from "./pages/intakeForms/additionalSymptom-intake-form";
+import HeadacheIntakeForm from "./pages/intakeForms/headache-intake-form";
+import SleepDisturbanceIntakeForm from "./pages/intakeForms/sleep-disturbance-intake-form";
+import BodyPainIntakeForm from "./pages/intakeForms/body-pain-intake-form";
+import PreviousHeadInjuryIntakeForm from "./pages/intakeForms/previous-head-injury-intake-form";
+import ConcussionDetailsIntakeForm from "./pages/intakeForms/concussion-details-intake-form";
+import DevelopmentalHistoryIntakeForm from "./pages/intakeForms/developmental-history-intake-form";
+import SurgicalHistoryIntakeForm from "./pages/intakeForms/surgical-history-intake-form";
+import CurrentMadicationIntakeForm from "./pages/intakeForms/current-madication-intake-form";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -221,6 +225,21 @@ function UserRouter() {
       <UserPrivateRoute path="/body-pain-intake-form">
         <BodyPainIntakeForm />
       </UserPrivateRoute>
+      <UserPrivateRoute path="/previous-head-injuries-intake-form">
+        <PreviousHeadInjuryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/concussion-details-intake-form">
+        <ConcussionDetailsIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/developmental-history-intake-form">
+        <DevelopmentalHistoryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/surgical-history-intake-form">
+        <SurgicalHistoryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/current-madication-intake-form">
+        <CurrentMadicationIntakeForm />
+      </UserPrivateRoute>
       {/* Catch all route */}
       <Route component={NotFound} />
     </Switch>
@@ -231,14 +250,14 @@ function App() {
   return (
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+        {/* <AuthProvider> */}
           <SettingsProvider>
             <TooltipProvider>
               <Toaster />
               <UserRouter />
             </TooltipProvider>
           </SettingsProvider>
-        </AuthProvider>
+        {/* </AuthProvider> */}
       </QueryClientProvider>
     </Provider>
   );
