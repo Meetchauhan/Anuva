@@ -69,7 +69,7 @@ const DevelopmentalHistoryInfo = () => {
       
       toast({
         title: "Developmental history submitted successfully",
-        description: "Your developmental history has been submitted successfully",
+        description: response.message || "Your developmental history has been submitted successfully",
       })
       
       form.reset()
@@ -98,7 +98,7 @@ const DevelopmentalHistoryInfo = () => {
         <CardContent className="relative">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {isSubmitting && (
+              {/* {isSubmitting && (
                 <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -106,15 +106,15 @@ const DevelopmentalHistoryInfo = () => {
                     <p className="text-sm text-gray-500">Please wait while we save your information</p>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Patient Information */}
               <div className="space-y-4">
-                {isSubmitting ? (
+                {/* {isSubmitting ? (
                   <Skeleton className="h-6 w-40" />
                 ) : (
                   <h3 className="text-lg font-semibold border-b pb-2">Patient Information</h3>
-                )}
+                )} */}
                 
                 {/* <FormField
                   control={form.control}

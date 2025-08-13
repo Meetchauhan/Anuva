@@ -28,7 +28,7 @@ interface AdminAuthState {
 
 // Interface for registration form data
 interface RegisterFormData {
-  username: string;
+  userName: string;
   password: string;
   fullName: string;
   email: string;

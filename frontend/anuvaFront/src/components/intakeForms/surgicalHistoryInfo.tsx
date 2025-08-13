@@ -70,7 +70,7 @@ const SurgicalHistoryInfo = () => {
       
       toast({
         title: "Surgical history submitted successfully",
-        description: "Your surgical history has been submitted successfully",
+        description: response.message || "Your surgical history has been submitted successfully",
       })
       
       form.reset()
@@ -99,7 +99,7 @@ const SurgicalHistoryInfo = () => {
         <CardContent className="relative">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {isSubmitting && (
+              {/* {isSubmitting && (
                 <div className="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -107,7 +107,7 @@ const SurgicalHistoryInfo = () => {
                     <p className="text-sm text-gray-500">Please wait while we save your information</p>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Patient Information */}
               {/* <div className="space-y-4">
@@ -255,7 +255,6 @@ const SurgicalHistoryInfo = () => {
               </div>
 
               {/* Information Box */}
-              {!isSubmitting && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h5 className="text-sm font-medium text-blue-800 mb-2">Important Information:</h5>
                   <p className="text-sm text-blue-700">
@@ -263,10 +262,10 @@ const SurgicalHistoryInfo = () => {
                     Please provide accurate information about all surgical procedures you have undergone.
                   </p>
                 </div>
-              )}
+             
 
               {/* Additional Notes Box */}
-              {!isSubmitting && (
+             
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <h5 className="text-sm font-medium text-yellow-800 mb-2">Note:</h5>
                   <p className="text-sm text-yellow-700">
@@ -274,7 +273,7 @@ const SurgicalHistoryInfo = () => {
                     This helps maintain detailed records for each surgical intervention.
                   </p>
                 </div>
-              )}
+                  
 
               {/* Submit Button */}
               <div className="flex justify-end space-x-4 pt-6">

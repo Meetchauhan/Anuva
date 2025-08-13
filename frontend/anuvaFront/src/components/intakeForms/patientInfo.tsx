@@ -84,7 +84,7 @@ const PatientInfo = () => {
       navigate("/home")
       toast({
         title: "Patient information submitted successfully",
-        description: "Patient information has been submitted successfully",
+        description: response.message || "Patient information has been submitted successfully",
       })
     } else {
       setIsSubmitting(false);

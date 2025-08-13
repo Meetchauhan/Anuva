@@ -22,8 +22,8 @@ import { additionalSymptomChecklistInfoForm } from "@/features/intakeFormSlice/a
 
 // Zod schema for additional symptoms validation
 const additionalSymptomSchema = z.object({
-  patientID: z.string().min(1, "Patient ID is required"),
-  injuryID: z.string().min(1, "Injury ID is required"),
+  // patientID: z.string().min(1, "Patient ID is required"),
+  // injuryID: z.string().min(1, "Injury ID is required"),
   painLocation: z.string().max(100, "Pain location must be less than 100 characters").optional(),
   painInOtherParts: z.number().min(0).max(6),
   problemsWithSleeping: z.number().min(0).max(6),
@@ -65,8 +65,8 @@ const AdditionalSymptomInfo = () => {
   const form = useForm<AdditionalSymptomFormData>({
     resolver: zodResolver(additionalSymptomSchema),
     defaultValues: {
-      patientID: (userAuth as any)?.user?.patientId || 0,
-      injuryID: (userAuth as any)?.user?.injuryId || 0, // This should be passed as prop or from context
+      // patientID: (userAuth as any)?.user?.patientId || 0,
+      // injuryID: (userAuth as any)?.user?.injuryId || 0, 
       painLocation: "",
       painInOtherParts: 0,
       problemsWithSleeping: 0,
@@ -186,7 +186,7 @@ const AdditionalSymptomInfo = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Patient Information */}
               
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-lg font-semibold border-b pb-2">Patient Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -234,7 +234,7 @@ const AdditionalSymptomInfo = () => {
                     )}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* General Somatic Symptoms */}
               <div className="space-y-6">

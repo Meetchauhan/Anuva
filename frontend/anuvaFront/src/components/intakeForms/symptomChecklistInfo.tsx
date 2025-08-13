@@ -22,8 +22,8 @@ import { symptomChecklistInfoForm } from "@/features/intakeFormSlice/symptomChec
 
 // Zod schema for symptom checklist validation
 const symptomChecklistSchema = z.object({
-  patientID: z.string().min(1, "Patient ID is required"),
-  injuryID: z.string().min(1, "Injury ID is required"),
+  // patientID: z.string().min(1, "Patient ID is required"),
+  // injuryID: z.string().min(1, "Injury ID is required"),
   headache: z.number().min(0).max(6),
   pressureInHead: z.number().min(0).max(6),
   neckPain: z.number().min(0).max(6),
@@ -62,8 +62,8 @@ const SymptomChecklistInfo = () => {
   const form = useForm<SymptomChecklistFormData>({
     resolver: zodResolver(symptomChecklistSchema),
     defaultValues: {
-      patientID: (userAuth as any)?.user?.patientId || 0,
-      injuryID: (userAuth as any)?.user?.injuryId || 0, // This should be passed as prop or from context
+      // patientID: (userAuth as any)?.user?.patientId || 0,
+      // injuryID: (userAuth as any)?.user?.injuryId || 0, // This should be passed as prop or from context
       headache: 0,
       pressureInHead: 0,
       neckPain: 0,
@@ -185,7 +185,7 @@ const SymptomChecklistInfo = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               {/* Patient Information */}
              
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h3 className="text-lg font-semibold border-b pb-2">Patient Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -235,7 +235,7 @@ const SymptomChecklistInfo = () => {
                     )}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Physical Symptoms */}
               <div className="space-y-6">

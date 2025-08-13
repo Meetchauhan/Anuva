@@ -74,7 +74,7 @@ const ConcussionDetailsInfo = () => {
 
       toast({
         title: "Concussion details submitted successfully",
-        description: "Your concussion details have been submitted successfully",
+        description: response.message || "Your concussion details have been submitted successfully",
       })
       
       form.reset()

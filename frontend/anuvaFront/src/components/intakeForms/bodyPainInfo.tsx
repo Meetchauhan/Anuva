@@ -27,7 +27,7 @@ import { bodyPainInfoForm } from "@/features/intakeFormSlice/bodypainInfoSlice"
 
 // Zod schema for body pain information validation
 const bodyPainSchema = z.object({
-  patientID: z.string().min(1, "Patient ID is required"),
+  // patientID: z.string().min(1, "Patient ID is required"),
   bodyPart: z.string().min(1, "Body part is required").max(50, "Body part must be less than 50 characters"),
   dateOfOnset: z.date({
     required_error: "Date of onset is required",
@@ -58,7 +58,7 @@ const BodyPainInfo = () => {
   const form = useForm<BodyPainFormData>({
     resolver: zodResolver(bodyPainSchema),
     defaultValues: {
-      patientID: (userAuth as any)?.user?.patientId || 0,
+      // patientID: (userAuth as any)?.user?.patientId || 0,
       bodyPart: "",
       dateOfOnset: new Date(),
       severity: 5,
@@ -175,7 +175,7 @@ const BodyPainInfo = () => {
                 )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="patientID"
                     render={({ field }) => (
@@ -201,7 +201,7 @@ const BodyPainInfo = () => {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}
@@ -238,13 +238,11 @@ const BodyPainInfo = () => {
                       </FormItem>
                     )}
                   />
-                </div>
-
-                <FormField
+                  <FormField
                   control={form.control}
                   name="dateOfOnset"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem className="">
                       <FormLabel>Date of Pain Onset *</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -283,6 +281,9 @@ const BodyPainInfo = () => {
                     </FormItem>
                   )}
                 />
+                </div>
+
+                
               </div>
 
               {/* Pain Assessment */}

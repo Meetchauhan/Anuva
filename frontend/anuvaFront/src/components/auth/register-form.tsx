@@ -50,14 +50,14 @@ export function RegisterForm() {
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      userName: "",
+      username: "",
       password: "",
       fullName: "",
       email: "",
       // role: UserRole.PATIENT,
       phoneNumber: "",
       speciality: "",
-      licenseNumber: "",
+      // licenseNumber: "",
       // relationToPatient: "",
     },
   });
@@ -71,13 +71,13 @@ export function RegisterForm() {
 
     try {
       const response = await dispatch(signupAdmin({ 
-        username: data.userName, 
+        userName: data.userName, 
         password: data.password, 
         fullName: data.fullName, 
         email: data.email, 
         phoneNumber: data.phoneNumber, 
         speciality: data.speciality, 
-        licenseNumber: data.licenseNumber,
+        // licenseNumber: data.licenseNumber,
         role: "provider"
       })).unwrap();
       

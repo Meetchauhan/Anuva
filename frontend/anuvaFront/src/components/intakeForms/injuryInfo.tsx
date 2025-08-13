@@ -28,7 +28,7 @@ import { injuryInfoForm } from "@/features/intakeFormSlice/injuryInfoSlice"
 
 // Zod schema for injury information validation
 const injuryInfoSchema = z.object({
-  patientID: z.string().min(1, "Patient ID is required"),
+  // patientID: z.string().min(1, "Patient ID is required"),
   dateOfInjury: z.date({
     required_error: "Date of injury is required",
   }).refine((date) => {
@@ -77,7 +77,7 @@ const InjuryInfo = () => {
   const form = useForm<InjuryInfoFormData>({
     resolver: zodResolver(injuryInfoSchema),
     defaultValues: {
-      patientID: (userAuth as any)?.user?.patientId || 0,
+      // patientID: (userAuth as any)?.user?.patientId || 0,
       dateOfInjury: new Date(),
       sportOrActivity: "",
       setting: "game",  
@@ -121,7 +121,7 @@ const InjuryInfo = () => {
     // dispatch(getUser())
     toast({
       title: "Injury information submitted successfully",
-      description: "Injury information has been submitted successfully",
+      description: response.message || "Injury information has been submitted successfully",
     })
     form.reset()
     navigate("/home")
@@ -155,7 +155,7 @@ const InjuryInfo = () => {
                 <h3 className="text-lg font-semibold border-b pb-2">Basic Injury Information</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="patientID"
                     render={({ field }) => (
@@ -177,7 +177,7 @@ const InjuryInfo = () => {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}

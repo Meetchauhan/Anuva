@@ -49,7 +49,13 @@ import PreviousHeadInjuryIntakeForm from "./pages/intakeForms/previous-head-inju
 import ConcussionDetailsIntakeForm from "./pages/intakeForms/concussion-details-intake-form";
 import DevelopmentalHistoryIntakeForm from "./pages/intakeForms/developmental-history-intake-form";
 import SurgicalHistoryIntakeForm from "./pages/intakeForms/surgical-history-intake-form";
-import CurrentMadicationIntakeForm from "./pages/intakeForms/current-madication-intake-form";
+import CurrentMedicationIntakeForm from "./pages/intakeForms/current-medications-intake-form";
+import PastMedicationsIntakeForm from "./pages/intakeForms/past-medications-intake-form";
+import AllergiesIntakeForm from "./pages/intakeForms/allergies-intake-form";
+import SeizureHistoryIntakeForm from "./pages/intakeForms/suizure-history-intake-form";
+import FamilyHistoryIntakeForm from "./pages/intakeForms/family-history-intake-form";
+import SubstanceUseHistoryIntakeForm from "./pages/intakeForms/substance-use-history-intake-form";
+import PreviousTestIntakeForm from "./pages/intakeForms/previous-test-intake-form";
 
 // Redirect component to handle automatic redirection based on token
 function AutoRedirect() {
@@ -237,8 +243,26 @@ function UserRouter() {
       <UserPrivateRoute path="/surgical-history-intake-form">
         <SurgicalHistoryIntakeForm />
       </UserPrivateRoute>
-      <UserPrivateRoute path="/current-madication-intake-form">
-        <CurrentMadicationIntakeForm />
+      <UserPrivateRoute path="/current-medications-intake-form">
+        <CurrentMedicationIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/past-medications-intake-form">
+        <PastMedicationsIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/allergies-intake-form">
+        <AllergiesIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/seizure-history-intake-form">
+        <SeizureHistoryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/family-history-intake-form">
+        <FamilyHistoryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/substance-use-history-intake-form">
+        <SubstanceUseHistoryIntakeForm />
+      </UserPrivateRoute>
+      <UserPrivateRoute path="/previous-tests-intake-form">
+        <PreviousTestIntakeForm />
       </UserPrivateRoute>
       {/* Catch all route */}
       <Route component={NotFound} />

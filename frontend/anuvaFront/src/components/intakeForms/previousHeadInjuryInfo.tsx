@@ -23,7 +23,7 @@ import { previousHeadInjuryInfoForm } from "@/features/intakeFormSlice/previousH
 
 // Zod schema for previous head injury validation
 const previousHeadInjurySchema = z.object({
-  patientID: z.string().min(1, "Patient ID is required"),
+  // patientID: z.string().min(1, "Patient ID is required"),
   hasPreviousInjuries: z.boolean(),
   totalNumberOfInjuries: z.number().min(0).max(50).optional(),
 }).refine((data) => {
@@ -47,7 +47,7 @@ const PreviousHeadInjuryInfo = () => {
   const form = useForm<PreviousHeadInjuryFormData>({
     resolver: zodResolver(previousHeadInjurySchema),
     defaultValues: {
-      patientID: (userAuth as any)?.user?.patientId || '',
+      // patientID: (userAuth as any)?.user?.patientId || '',
       hasPreviousInjuries: false,
       totalNumberOfInjuries: 0,
     },
@@ -61,7 +61,7 @@ const PreviousHeadInjuryInfo = () => {
                  
       toast({
         title: "Previous head injury information submitted successfully",
-        description: "Your previous head injury information has been submitted successfully",
+        description: response.message || "Your previous head injury information has been submitted successfully",
       })
       
       form.reset()
@@ -128,7 +128,7 @@ const PreviousHeadInjuryInfo = () => {
               
 
               {/* Patient Information */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 {isSubmitting ? (
                   <Skeleton className="h-6 w-40" />
                 ) : (
@@ -162,7 +162,7 @@ const PreviousHeadInjuryInfo = () => {
                     </FormItem>
                   )}
                 />
-              </div>
+              </div> */}
 
               <Separator />
 
